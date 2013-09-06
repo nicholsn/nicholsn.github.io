@@ -1,5 +1,7 @@
 # Files and Directories
 output/*
+pelican.pid
+srv.pid
 
 *.py[cod]
 
