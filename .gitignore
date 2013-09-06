@@ -1,3 +1,6 @@
+# Files and Directories
+output/*
+
 *.py[cod]
 
 # C extensions
