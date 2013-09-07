@@ -31,3 +31,10 @@ DEFAULT_PAGINATION = 10
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
+
+NIUX2_HEADER_SECTIONS = [ 
+     ("About", "about", "/pages/about.html", "icon-book"),
+     ("Research", "research", "/pages/research.html", "icon-beaker"),
+     ("Archives", "archives", "/archives.html", "icon-archive"),
+     ("Tags", "tags", "/tags.html", "icon-tag"),
+]
