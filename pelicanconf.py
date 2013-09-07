@@ -3,12 +3,14 @@
 from __future__ import unicode_literals
 
 AUTHOR = u'Nolan Nichols'
-SITENAME = u'Nolan Nichols Homepage'
+SITENAME = u'Nolan-Nichols'
 SITEURL = ''
 
-TIMEZONE = 'Europe/Paris'
+TIMEZONE = 'America/Vancouver'
 
 DEFAULT_LANG = u'en'
+
+THEME = "niu-x2"
 
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
