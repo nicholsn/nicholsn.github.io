@@ -20,15 +20,14 @@ SITE_THUMBNAIL = "https://en.gravatar.com/userimage/26595965/475a270547e0d8313e9
 SITE_THUMBNAIL_TEXT = "Nolan Nichols"
 
 # Feed generation is usually not desired when developing
-FEED_ALL_ATOM = None
-CATEGORY_FEED_ATOM = None
+FEED_ALL_ATOM = False
+CATEGORY_FEED_ATOM = False
 TRANSLATION_FEED_ATOM = None
 
 # Blogroll
 LINKS =  (('Pelican', 'http://getpelican.com/'),
           ('Python.org', 'http://python.org/'),
-          ('Jinja2', 'http://jinja.pocoo.org/'),
-         )
+          ('Jinja2', 'http://jinja.pocoo.org/'),)
 
 # Social widget
 SOCIAL = (('Github', 'https://github.com/nicholsn'),
@@ -43,5 +42,8 @@ RELATIVE_URLS = True
 MENUITEMS = []
 
 DISQUS_SITENAME = "nolan-nichols"
+
+ARTICLE_EDIT_LINK = 'https://github.com/nicholsn/nicholsn.github.io/edit/master/content/posts/%(slug)s.md'
+
 
 GOOGLE_SEARCH = "001358792457409399469:hzfp1rcbkgw"
