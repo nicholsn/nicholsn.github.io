@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Nolan Nichols'
 SITENAME = u'Nolan Nichols'
-SITESUBTITLE= "ramblings of a neuroinformatician"
+SITESUBTITLE= "musings of a neuroinformatician"
 SITEURL = 'http://nicholsn.github.io'
 
 TIMEZONE = 'America/Vancouver'
