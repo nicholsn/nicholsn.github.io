@@ -14,7 +14,9 @@ DEFAULT_LANG = u'en'
 THEME = "plumage"
 
 PLUGIN_PATH = "/Users/nolan/PycharmProjects/pelican-plugins"
-PLUGINS = ["neighbors", "related_posts", ]
+PLUGINS = ["neighbors", "related_posts", "microdata" ]
+
+FILES_TO_COPY = (('extra/CNAME', 'CNAME'),)
 
 SITE_THUMBNAIL = "https://en.gravatar.com/userimage/26595965/475a270547e0d8313e94494e9a17f10f.png"
 SITE_THUMBNAIL_TEXT = "Nolan Nichols"
@@ -43,7 +45,7 @@ MENUITEMS = []
 
 DISQUS_SITENAME = "nolan-nichols"
 
-ARTICLE_EDIT_LINK = 'https://github.com/nicholsn/nicholsn.github.io/edit/master/content/posts/%(slug)s.md'
+ARTICLE_EDIT_LINK = 'https://github.com/nicholsn/nicholsn.github.io/blob/gh-pages/content/%(slug)s.md'
 
 
 GOOGLE_SEARCH = "001358792457409399469:hzfp1rcbkgw"
