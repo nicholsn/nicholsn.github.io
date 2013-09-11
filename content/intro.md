@@ -1,4 +1,4 @@
-Title: Introductory post
+Title: Under Construction...
 Date: 2013-09-08 10:30
 Category: Python
 Tags: pelican, publishing
