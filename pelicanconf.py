@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Nolan Nichols'
 SITENAME = u'Nolan Nichols'
 SITESUBTITLE= "musings of a neuroinformatician"
-SITEURL = 'http://nicholsn.github.io'
+SITEURL = ''
 
 TIMEZONE = 'America/Vancouver'
 
@@ -14,9 +14,10 @@ DEFAULT_LANG = u'en'
 THEME = "plumage"
 
 PLUGIN_PATH = "/Users/nolan/PycharmProjects/pelican-plugins"
-PLUGINS = ["neighbors", "related_posts", "microdata" ]
+PLUGINS = ["neighbors", "related_posts",]
 
-FILES_TO_COPY = (('extra/CNAME', 'CNAME'),)
+STATIC_PATHS = ['images', 'extra/CNAME']
+EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'},}
 
 SITE_THUMBNAIL = "https://en.gravatar.com/userimage/26595965/475a270547e0d8313e94494e9a17f10f.png"
 SITE_THUMBNAIL_TEXT = "Nolan Nichols"
