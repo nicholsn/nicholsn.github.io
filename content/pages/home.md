@@ -1,8 +1,9 @@
 Title:
 URL:
-slug: home
-status: hidden
-save_as: index.html
+Status: hidden
+Slug: home
+Save_as: index.html
+Author: Nolan Nichols
 
 Welcome to my homepage. I'm still working on content, so check back soon!
 
