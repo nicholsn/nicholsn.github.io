@@ -1,6 +1,7 @@
 Title:
 URL:
-Slug: home
+slug: home
+status: hidden
 save_as: index.html
 
 Welcome to my homepage. I'm still working on content, so check back soon!
