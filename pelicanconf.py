@@ -30,6 +30,7 @@ DISPLAY_ARTICLE_INFO_ON_INDEX = True
 ABOUT_ME = ""
 AVATAR = "https://en.gravatar.com/userimage/26595965/475a270547e0d8313e94494e9a17f10f.png?size=200"
 CC_LICENSE = "CC-BY"
+DIRECT_TEMPLATES = (('search',))
 
 # Template settings
 DISPLAY_PAGES_ON_MENU = True
@@ -49,8 +50,8 @@ DEFAULT_PAGINATION = 10
 RECENT_POST_COUNT = 5
 
 # Plugins
-PLUGIN_PATHS = "/Users/nolan/Repos/pelican-plugins"
-PLUGINS = ["related_posts"]
+PLUGIN_PATHS = ["/Users/nolan/Repos/pelican-plugins"]
+PLUGINS = ['related_posts', 'tipue_search']
 
 # Static paths and cname mapping
 STATIC_PATHS = ['images', 'extra/CNAME']

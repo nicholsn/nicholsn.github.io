@@ -1,4 +1,4 @@
-Title:
+Title:Home
 URL:
 Status: hidden
 Slug: home
