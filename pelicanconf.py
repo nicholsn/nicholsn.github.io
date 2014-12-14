@@ -49,7 +49,7 @@ DEFAULT_PAGINATION = 10
 RECENT_POST_COUNT = 5
 
 # Plugins
-PLUGIN_PATH = "/Users/nolan/PycharmProjects/pelican-plugins"
+PLUGIN_PATHS = "/Users/nolan/Repos/pelican-plugins"
 PLUGINS = ["related_posts"]
 
 # Static paths and cname mapping
