@@ -2,6 +2,7 @@
 output/*
 pelican.pid
 srv.pid
+cache/*
 
 *.py[cod]
 
