@@ -2,7 +2,8 @@
 <html lang="en"
 >
 <head>
-    <title> - Nolan Nichols</title>
+    <title>Search - Nolan Nichols
+</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -11,16 +12,15 @@
 
     <link href="./images/favicon.png" rel="icon">
 
-<link rel="canonical" href="./">
 
-        <meta name="author" content="Nolan Nichols <http://orcid.org/0000-0003-1099-3328>" />
-        <meta name="description" content="Nolan Nichols, Ph.D. Postdoctoral Fellow Neuroscience Program SRI International Menlo Park, CA 94025 nolan.nichols (at) gmail.com" />
+        <meta name="author" content="Nolan Nichols" />
 
-    <meta property="og:site_name" content="Nolan Nichols" />
-    <meta property="og:type" content="article"/>
-    <meta property="og:title" content=""/>
-    <meta property="og:url" content="./"/>
-    <meta property="og:description" content="Nolan Nichols, Ph.D. Postdoctoral Fellow Neuroscience Program SRI International Menlo Park, CA 94025 nolan.nichols (at) gmail.com" />
+    <!-- Open Graph tags -->
+        <meta property="og:site_name" content="Nolan Nichols" />
+        <meta property="og:type" content="website"/>
+        <meta property="og:title" content="Nolan Nichols"/>
+        <meta property="og:url" content="."/>
+        <meta property="og:description" content="Nolan Nichols"/>
 
 
     <!-- Bootstrap -->
@@ -52,7 +52,7 @@ Nolan Nichols            </a>
                          <li><a href="./pages/about.html">
                              About
                           </a></li>
-                         <li class="active"><a href="./">
+                         <li><a href="./">
                              
                           </a></li>
                          <li><a href="./pages/research.html">
@@ -77,28 +77,7 @@ Nolan Nichols            </a>
     <div class="row">
         <div class="col-sm-9">
 
-    <section id="content" class="body">
-        <h1 class="entry-title"></h1>
-        
-        <div class="entry-content">
-            <p><table>
-    <tr>
-      <td align="center" width=25%>
-        <img src="./images/nolan.png"></br>
-        Nolan Nichols, Ph.D.</br>
-        Postdoctoral Fellow</br>
-        Neuroscience Program</br>
-        SRI International</br>
-        Menlo Park, CA 94025</br>
-        <a href="mailto:nolan.nichols@gmail.com">nolan.nichols (at) gmail.com</a>
-      </td>
-      <td style="padding: 50px;">
-        <img src="./images/summerland.jpg">
-      </td>
-    </tr>
-  </table></p>
-        </div>
-    </section>
+<div id="tipue_search_content"></div>
         </div>
         <div class="col-sm-3" id="sidebar">
             <aside>
@@ -231,5 +210,18 @@ Nolan Nichols            </a>
     </script>
     <!-- End Google Analytics Universal Code -->
 
+    <link href="./theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script type="text/javascript" src="./theme/tipuesearch/tipuesearch_set.js"></script>
+    <script type="text/javascript" src="./theme/tipuesearch/tipuesearch.min.js"></script>
+    <script>
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch({
+        'mode' : 'json',
+        'show': 10,
+        'newWindow': false,
+        'contentLocation': 'tipuesearch_content.json'
+      });
+    });
+    </script>
 </body>
 </html>
