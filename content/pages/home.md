@@ -1,10 +1,23 @@
-Title:Home
+Title:
 URL:
-Status: hidden
 Slug: home
 Save_as: index.html
-Author: Nolan Nichols
+Status: hidden
+Author: Nolan Nichols <http://orcid.org/0000-0003-1099-3328>
 
-Welcome to my homepage. I'm still working on content, so check back soon!
-
-In the meantime you can find me on [LinkedIn](http://www.linkedin.com/in/nolannichols/)
+  <table>
+    <tr>
+      <td align="center" width=25%>
+        <img src="./images/nolan.png"></br>
+        Nolan Nichols, Ph.D.</br>
+        Postdoctoral Fellow</br>
+        Neuroscience Program</br>
+        SRI International</br>
+        Menlo Park, CA 94025</br>
+        <a href="mailto:nolan.nichols@gmail.com">nolan.nichols (at) gmail.com</a>
+      </td>
+      <td style="padding: 50px;">
+        <img src="./images/summerland.jpg">
+      </td>
+    </tr>
+  </table>

@@ -30,12 +30,12 @@ DISPLAY_ARTICLE_INFO_ON_INDEX = True
 ABOUT_ME = ""
 AVATAR = "https://en.gravatar.com/userimage/26595965/475a270547e0d8313e94494e9a17f10f.png?size=200"
 CC_LICENSE = "CC-BY"
-DIRECT_TEMPLATES = (('search',))
 
 # Template settings
 DISPLAY_PAGES_ON_MENU = True
 DISPLAY_CATEGORIES_ON_MENU = False
 MENUITEMS = []
+DIRECT_TEMPLATES = ('index', 'categories', 'authors', 'archives', 'search')
 
 # Blogroll
 LINKS =  (('Pelican', 'http://getpelican.com/'),)
@@ -54,8 +54,13 @@ PLUGIN_PATHS = ["/Users/nolan/Repos/pelican-plugins"]
 PLUGINS = ['related_posts', 'tipue_search']
 
 # Static paths and cname mapping
+PATH = "content"
 STATIC_PATHS = ['images', 'extra/CNAME']
 EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'},}
+PAGE_PATHS = ['pages']
+ARTICLE_PATHS = ['articles']
+ARTICLE_EXCLUDES = ['.']
+
 
 # Social widget
 SOCIAL = (('Github', 'https://github.com/nicholsn'),
