@@ -5,7 +5,7 @@ Save_as: index.html
 Status: hidden
 Author: Nolan Nichols <http://orcid.org/0000-0003-1099-3328>
 
-  <table>
+<table>
     <tr>
       <td align="center" width=25%>
         <img src="./images/nolan.png"></br>
@@ -20,4 +20,4 @@ Author: Nolan Nichols <http://orcid.org/0000-0003-1099-3328>
         <img src="./images/summerland.jpg">
       </td>
     </tr>
-  </table>
+</table>
