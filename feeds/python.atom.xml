@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nolan Nichols</title><link href="http://nolan-nichols.com/" rel="alternate"></link><link href="http://nolan-nichols.com/feeds/nolan-nichols.atom.xml" rel="self"></link><id>http://nolan-nichols.com/</id><updated>2013-09-08T10:30:00-07:00</updated><entry><title>Under Construction...</title><link href="http://nolan-nichols.com/intro.html" rel="alternate"></link><updated>2013-09-08T10:30:00-07:00</updated><author><name>Nolan Nichols</name></author><id>tag:nolan-nichols.com,2013-09-08:intro.html</id><summary type="html">&lt;h1&gt;Testing...&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nolan Nichols</title><link href="http://nolan-nichols.com/" rel="alternate"></link><link href="http://nolan-nichols.com/feeds/python.atom.xml" rel="self"></link><id>http://nolan-nichols.com/</id><updated>2013-09-08T10:30:00-07:00</updated><entry><title>Under Construction...</title><link href="http://nolan-nichols.com/intro.html" rel="alternate"></link><updated>2013-09-08T10:30:00-07:00</updated><author><name>Nolan Nichols</name></author><id>tag:nolan-nichols.com,2013-09-08:intro.html</id><summary type="html">&lt;h1&gt;Testing...&lt;/h1&gt;
 &lt;p&gt;
 &lt;div class="cell border-box-sizing code_cell rendered"&gt;
 &lt;div class="input"&gt;
