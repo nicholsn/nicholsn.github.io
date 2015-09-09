@@ -35,6 +35,8 @@ SHOW_ARTICLE_CATEGORY = True
 USE_PAGER = True
 BOOTSTRAP_FLUID = True
 RELATED_POSTS_MAX = 10
+USE_OPEN_GRAPH = True
+
 # Notebook Rendering
 NOTEBOOK_DIR = 'notebooks'
 EXTRA_HEADER = open('_nb_header.html').read().decode('utf-8')
@@ -79,6 +81,10 @@ SOCIAL = (('Github', 'https://github.com/nicholsn'),
 
 # Disqus config
 DISQUS_SITENAME = "nicholsn"
+
+# Addthis
+ADDTHIS_PROFILE = "ra-55f098e034ebcb96"
+ADDTHIS_DATA_TRACK_ADDRESSBAR = False
 
 # Github
 GITHUB_USER = "nicholsn"
