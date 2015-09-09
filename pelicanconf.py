@@ -30,6 +30,14 @@ DISPLAY_ARTICLE_INFO_ON_INDEX = True
 ABOUT_ME = ""
 AVATAR = "https://en.gravatar.com/userimage/26595965/475a270547e0d8313e94494e9a17f10f.png?size=200"
 CC_LICENSE = "CC-BY"
+SHOW_ARTICLE_AUTHOR = True
+SHOW_ARTICLE_CATEGORY = True
+USE_PAGER = True
+BOOTSTRAP_FLUID = True
+RELATED_POSTS_MAX = 10
+# Notebook Rendering
+NOTEBOOK_DIR = 'notebooks'
+EXTRA_HEADER = open('_nb_header.html').read().decode('utf-8')
 
 # Template settings
 DISPLAY_PAGES_ON_MENU = True
@@ -38,7 +46,7 @@ MENUITEMS = []
 DIRECT_TEMPLATES = ('index', 'categories', 'authors', 'archives', 'search')
 
 # Blogroll
-LINKS =  (('Pelican', 'http://getpelican.com/'),)
+LINKS = (('Pelican', 'http://getpelican.com/'),)
 TAG_CLOUD_MAX_ITEMS = 20
 DISPLAY_TAGS_ON_SIDEBAR = True
 DISPLAY_TAGS_INLINE = True
@@ -51,7 +59,10 @@ RECENT_POST_COUNT = 5
 
 # Plugins
 PLUGIN_PATHS = ["/Users/nolan/Repos/pelican-plugins"]
-PLUGINS = ['related_posts', 'tipue_search']
+PLUGINS = ['related_posts', 'tipue_search', 'liquid_tags.img',
+           'liquid_tags.video', 'liquid_tags.youtube',
+           'liquid_tags.vimeo', 'liquid_tags.include_code',
+           'liquid_tags.notebook']
 
 # Static paths and cname mapping
 PATH = "content"
@@ -68,8 +79,6 @@ SOCIAL = (('Github', 'https://github.com/nicholsn'),
 
 # Disqus config
 DISQUS_SITENAME = "nicholsn"
-#DISQUS_SECRET_KEY = open(os.path.join(os.path.expanduser('~'), '.disqus_secret_key')).read()
-#DISQUS_PUBLIC_KEY = u'iSFOPGc1Dvv6EmPU01BRQt1bK9GproBDnPc5IVFLJj7ETeEFMXVM5YiXwcTcK3Bd'
 
 # Github
 GITHUB_USER = "nicholsn"

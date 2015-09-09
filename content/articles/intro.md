@@ -8,3 +8,5 @@ Summary: Introductory post
 
 Testing...
 ==========
+
+{% notebook example.ipynb %}
