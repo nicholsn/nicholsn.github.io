@@ -44,7 +44,6 @@ EXTRA_HEADER = open('_nb_header.html').read().decode('utf-8')
 # Template settings
 DISPLAY_PAGES_ON_MENU = True
 DISPLAY_CATEGORIES_ON_MENU = False
-MENUITEMS = []
 DIRECT_TEMPLATES = ('index', 'categories', 'authors', 'archives', 'search')
 
 # Blogroll
