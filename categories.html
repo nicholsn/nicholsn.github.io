@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
     <title>Categories - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -188,9 +190,6 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
-
-
-
 </head>
 <body>
 
@@ -220,7 +219,7 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search.html">
+                <form class="navbar-search" action="/search">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
@@ -235,6 +234,7 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
+
     <section id="categories">
         <h1>All Categories for Nolan Nichols</h1>
         <div class="panel-group" id="accordion">
@@ -247,6 +247,18 @@ Nolan Nichols            </a>
                 <div id="collapse-conferences" class="panel-collapse collapse">
                     <div class="panel-body">
                         <p><span class="categories-timestamp"><time datetime="2015-09-21T00:00:00-07:00">Mon 21 September 2015</time></span> <a href="http://nolan-nichols.com/ni2015.html">NIDM and NCANDA at Neuroinformatics 2015</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-semantic-web">Semantic Web <span class="badge pull-right">1</span></a>
+                    </h4>
+                </div>
+                <div id="collapse-semantic-web" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <p><span class="categories-timestamp"><time datetime="2015-09-21T00:00:00-07:00">Mon 21 September 2015</time></span> <a href="http://nolan-nichols.com/rdfs-domain-inference.html">Exploring RDFS Inference with Domain and Range</a></p>
                     </div>
                 </div>
             </div>
@@ -274,11 +286,18 @@ Nolan Nichols            </a>
                             <i class="fa fa-folder-open fa-lg"></i> Conferences
                         </a>
                     </li>
+                    <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/semantic-web.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Semantic Web
+                        </a>
+                    </li>
                 </ul>
             </li>
 
-
-
+            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group list-inline tagcloud" id="tags">
+                </ul>
+            </li>
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">

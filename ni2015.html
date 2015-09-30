@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
     <title>NIDM and NCANDA at Neuroinformatics 2015 - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -197,11 +199,6 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
-
-
-        <link href="http://nolan-nichols.com/feeds/conferences.atom.xml" type="application/atom+xml" rel="alternate"
-              title="Nolan Nichols Conferences ATOM Feed"/>
-
 </head>
 <body>
 
@@ -231,7 +228,7 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search.html">
+                <form class="navbar-search" action="/search">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
@@ -246,6 +243,7 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
+
     <section id="content">
         <article>
             <header class="page-header">
@@ -265,8 +263,6 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2015-09-21T00:00:00-07:00"> Mon 21 September 2015</time>
     </span>
-
-
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -300,6 +296,12 @@ Nolan Nichols            </a>
             </div></p>
             </div>
             <!-- /.entry-content -->
+<section class="well" id="related-posts">
+    <h4>Related Posts:</h4>
+    <ul>
+        <li><a href="http://nolan-nichols.com/rdfs-domain-inference.html">Exploring RDFS Inference with Domain and Range</a></li>
+    </ul>
+</section>
     <hr />
     <!-- AddThis Button BEGIN -->
     <div class="addthis_toolbox addthis_default_style">
@@ -362,11 +364,18 @@ Nolan Nichols            </a>
                             <i class="fa fa-folder-open fa-lg"></i> Conferences
                         </a>
                     </li>
+                    <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/semantic-web.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Semantic Web
+                        </a>
+                    </li>
                 </ul>
             </li>
 
-
-
+            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group list-inline tagcloud" id="tags">
+                </ul>
+            </li>
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">

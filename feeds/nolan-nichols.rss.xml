@@ -11,4 +11,663 @@
                     frameborder='0' webkitAllowFullScreen mozallowfullscreen
                     allowFullScreen&gt;
                 &lt;/iframe&gt;
-            &lt;/div&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Nolan Nichols</dc:creator><pubDate>Mon, 21 Sep 2015 00:00:00 -0700</pubDate><guid>tag:nolan-nichols.com,2015-09-21:ni2015.html</guid><category>neuroinformatics</category><category>nidm</category><category>data sharing</category><category>ncanda</category></item></channel></rss>
+            &lt;/div&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Nolan Nichols</dc:creator><pubDate>Mon, 21 Sep 2015 00:00:00 -0700</pubDate><guid>tag:nolan-nichols.com,2015-09-21:ni2015.html</guid><category>neuroinformatics</category><category>nidm</category><category>data sharing</category><category>ncanda</category></item><item><title>Exploring RDFS Inference with Domain and Range</title><link>http://nolan-nichols.com/rdfs-domain-inference.html</link><description>&lt;p&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Overview"&gt;Overview&lt;a class="anchor-link" href="#Overview"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Inference using RDFS and OWL can be a confusing topic as it is not intuitive how topics like Domain and Range work when living with an &lt;a href="https://en.wikipedia.org/wiki/Open-world_assumption"&gt;Open World Assumption&lt;/a&gt;. It is common for folks to interpret, for example, the Domain of an Object or Data Propery in RDFS as a restriction on allowable values, when that is not what actually takes place during inference.&lt;/p&gt;
+&lt;p&gt;In this post, I'll use the &lt;a href="https://github.com/RDFLib/OWL-RL"&gt;OWL-RL&lt;/a&gt; library to show how inference works when specifying the Domain of an Object property to help others avoid some of the modeling errors I'm made and to better understand how inference can be benneficial.&lt;/p&gt;
+&lt;p&gt;First, we'll need an environment to work in, so if you want to execute this notebook yourself, you'll need to install the following.&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Dependencies"&gt;Dependencies&lt;a class="anchor-link" href="#Dependencies"&gt;&amp;#182;&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;To get started you will need the following libraries. Here I am configuring using conda to create a custom environment:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;conda create -n inference pip pyparsing html5lib notebook
+source activate inference
+pip install https://github.com/RDFLib/rdflib/archive/master.zip
+pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;/pre&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Import-RDF-Libraries"&gt;Import RDF Libraries&lt;a class="anchor-link" href="#Import-RDF-Libraries"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[1]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;rdflib&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;RDFClosure&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Create-and-Populate-a-Graph"&gt;Create and Populate a Graph&lt;a class="anchor-link" href="#Create-and-Populate-a-Graph"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;First we create a graph to work with as an example&lt;/li&gt;
+&lt;li&gt;Then we add a single triple to the graph that only includes a label&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[2]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rdflib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Graph&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[3]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;ttl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;@prefix : &amp;lt;#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;         @prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;         @prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;         @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;         @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;         &lt;/span&gt;
+&lt;span class="s"&gt;         :non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .&lt;/span&gt;
+&lt;span class="s"&gt;      &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[4]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ttl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[4]:&lt;/div&gt;
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;apos;rdflib.graph.Graph&amp;apos;&amp;gt;)&amp;gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[5]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;@prefix : &amp;lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&amp;gt; .
+@prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .
+@prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .
+@prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
+@prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
+
+:non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .
+
+
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Define-an--OWL-Classe-and-Datatype-Property"&gt;Define an  OWL Classe and Datatype Property&lt;a class="anchor-link" href="#Define-an--OWL-Classe-and-Datatype-Property"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Here we pull some example classes from an OWL file in the &lt;a href="http://nidm.nidash.org"&gt;Neuroimaging Data Model (NIDM)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;The first is an &lt;code&gt;owl:Class&lt;/code&gt; representing a Mask Map&lt;/li&gt;
+&lt;li&gt;Next is an &lt;code&gt;owl:DatatypeProperty&lt;/code&gt; with the class above listed as its &lt;code&gt;rdfs:domain&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;We then add these semantics to the same graph as our simple example above&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[6]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;owl&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;    @prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .&lt;/span&gt;
+
+&lt;span class="s"&gt;    nidm:NIDM_0000054 rdf:type owl:Class ;&lt;/span&gt;
+&lt;span class="s"&gt;                      rdfs:label &amp;quot;Mask Map&amp;quot; ;&lt;/span&gt;
+&lt;span class="s"&gt;                      obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .&lt;/span&gt;
+&lt;span class="s"&gt;                    &lt;/span&gt;
+&lt;span class="s"&gt;    nidm:NIDM_0000158 rdf:type owl:DatatypeProperty ;&lt;/span&gt;
+&lt;span class="s"&gt;                  rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;                  &lt;/span&gt;
+&lt;span class="s"&gt;                  rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;&lt;/span&gt;
+&lt;span class="s"&gt;                  obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;                  &lt;/span&gt;
+&lt;span class="s"&gt;                  rdfs:domain nidm:NIDM_0000054 .&lt;/span&gt;
+&lt;span class="s"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[7]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;owl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[7]:&lt;/div&gt;
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;apos;rdflib.graph.Graph&amp;apos;&amp;gt;)&amp;gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[8]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;@prefix : &amp;lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&amp;gt; .
+@prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .
+@prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .
+@prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .
+@prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .
+@prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .
+@prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
+@prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
+
+:non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .
+
+nidm:NIDM_0000158 a owl:DatatypeProperty ;
+    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
+    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:domain nidm:NIDM_0000054 .
+
+nidm:NIDM_0000054 a owl:Class ;
+    rdfs:label &amp;quot;Mask Map&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+
+
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Applying-RDFS-Reasoning"&gt;Applying RDFS Reasoning&lt;a class="anchor-link" href="#Applying-RDFS-Reasoning"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;First we will just apply reasoning to the graph as-is and see the result&lt;/li&gt;
+&lt;li&gt;Then we will add our datatype property to the individual to see what the result is after reasoning&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[9]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;rdfs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;RDFClosure&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DeductiveClosure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RDFClosure&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RDFS_Semantics&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;rdfs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[10]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;@prefix : &amp;lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&amp;gt; .
+@prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .
+@prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .
+@prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .
+@prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .
+@prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .
+@prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
+@prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
+
+:non-typed-indv a rdfs:Resource ;
+    rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .
+
+nidm:NIDM_0000158 a rdfs:Resource,
+        owl:DatatypeProperty ;
+    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
+    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:domain nidm:NIDM_0000054 .
+
+rdfs:Literal a rdfs:Resource .
+
+obo:IAO_0000115 a rdf:Property ;
+    rdfs:subPropertyOf obo:IAO_0000115 .
+
+nidm:NIDM_0000054 a rdfs:Resource,
+        owl:Class ;
+    rdfs:label &amp;quot;Mask Map&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+
+rdf:type a rdf:Property ;
+    rdfs:subPropertyOf rdf:type .
+
+rdfs:comment a rdf:Property ;
+    rdfs:subPropertyOf rdfs:comment .
+
+rdfs:domain a rdf:Property ;
+    rdfs:subPropertyOf rdfs:domain .
+
+rdfs:label a rdf:Property ;
+    rdfs:subPropertyOf rdfs:label .
+
+rdfs:subPropertyOf a rdf:Property ;
+    rdfs:subPropertyOf rdfs:subPropertyOf .
+
+owl:Class a rdfs:Resource .
+
+owl:DatatypeProperty a rdfs:Resource .
+
+
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Notes-on-the-explanded-graph"&gt;Notes on the explanded graph&lt;a class="anchor-link" href="#Notes-on-the-explanded-graph"&gt;&amp;#182;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Here you now see that some basic triples have bee added to the graph that were not previously available.&lt;/li&gt;
+&lt;li&gt;There isn't much interesting added, although you'll see that our &lt;code&gt;:non-typed-indv a rdfs:Resource&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h2 id="Adding-a-Datatype-Property"&gt;Adding a Datatype Property&lt;a class="anchor-link" href="#Adding-a-Datatype-Property"&gt;&amp;#182;&lt;/a&gt;&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;We now use one of the NIDM datatype properties on our example triple and give it a value&lt;/li&gt;
+&lt;li&gt;Note that when the statement is parsed it is simply appended below our &lt;code&gt;:non-typed-indv&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[11]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;datatype&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s"&gt;           @prefix : &amp;lt;#&amp;gt; .&lt;/span&gt;
+&lt;span class="s"&gt;           @prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .&lt;/span&gt;
+
+&lt;span class="s"&gt;           :non-typed-indv nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .&lt;/span&gt;
+&lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[12]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;datatype&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt output_prompt"&gt;Out[12]:&lt;/div&gt;
+
+
+&lt;div class="output_text output_subarea output_execute_result"&gt;
+&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;apos;rdflib.graph.Graph&amp;apos;&amp;gt;)&amp;gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[13]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;@prefix : &amp;lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&amp;gt; .
+@prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .
+@prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .
+@prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .
+@prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .
+@prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .
+@prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
+@prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
+
+:non-typed-indv a rdfs:Resource ;
+    rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; ;
+    nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .
+
+nidm:NIDM_0000158 a rdfs:Resource,
+        owl:DatatypeProperty ;
+    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
+    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:domain nidm:NIDM_0000054 .
+
+rdfs:Literal a rdfs:Resource .
+
+obo:IAO_0000115 a rdf:Property ;
+    rdfs:subPropertyOf obo:IAO_0000115 .
+
+nidm:NIDM_0000054 a rdfs:Resource,
+        owl:Class ;
+    rdfs:label &amp;quot;Mask Map&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+
+rdf:type a rdf:Property ;
+    rdfs:subPropertyOf rdf:type .
+
+rdfs:comment a rdf:Property ;
+    rdfs:subPropertyOf rdfs:comment .
+
+rdfs:domain a rdf:Property ;
+    rdfs:subPropertyOf rdfs:domain .
+
+rdfs:label a rdf:Property ;
+    rdfs:subPropertyOf rdfs:label .
+
+rdfs:subPropertyOf a rdf:Property ;
+    rdfs:subPropertyOf rdfs:subPropertyOf .
+
+owl:Class a rdfs:Resource .
+
+owl:DatatypeProperty a rdfs:Resource .
+
+
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Inferring-additional-type-information-using-rdfs:domain-semantics"&gt;Inferring additional type information using rdfs:domain semantics&lt;a class="anchor-link" href="#Inferring-additional-type-information-using-rdfs:domain-semantics"&gt;&amp;#182;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Next we will expand the graph and see what happens&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing code_cell rendered"&gt;
+&lt;div class="input"&gt;
+&lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[14]:&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+    &lt;div class="input_area"&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;rdfs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="output_wrapper"&gt;
+&lt;div class="output"&gt;
+
+
+&lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
+&lt;div class="output_subarea output_stream output_stdout output_text"&gt;
+&lt;pre&gt;@prefix : &amp;lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&amp;gt; .
+@prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .
+@prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .
+@prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .
+@prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .
+@prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .
+@prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
+@prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
+
+:non-typed-indv a nidm:NIDM_0000054,
+        rdfs:Resource ;
+    rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; ;
+    nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .
+
+rdfs:Literal a rdfs:Resource .
+
+obo:IAO_0000115 a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf obo:IAO_0000115 .
+
+nidm:NIDM_0000158 a rdf:Property,
+        rdfs:Resource,
+        owl:DatatypeProperty ;
+    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
+    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:domain nidm:NIDM_0000054 ;
+    rdfs:subPropertyOf nidm:NIDM_0000158 .
+
+rdf:type a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf rdf:type .
+
+rdfs:comment a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf rdfs:comment .
+
+rdfs:domain a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf rdfs:domain .
+
+rdfs:label a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf rdfs:label .
+
+rdfs:subPropertyOf a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf rdfs:subPropertyOf .
+
+owl:Class a rdfs:Resource .
+
+owl:DatatypeProperty a rdfs:Resource .
+
+nidm:NIDM_0000054 a rdfs:Resource,
+        owl:Class ;
+    rdfs:label &amp;quot;Mask Map&amp;quot; ;
+    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+
+rdf:Property a rdfs:Resource .
+
+rdfs:Resource a rdfs:Resource .
+
+
+&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;div class="cell border-box-sizing text_cell rendered"&gt;
+&lt;div class="prompt input_prompt"&gt;
+&lt;/div&gt;
+&lt;div class="inner_cell"&gt;
+&lt;div class="text_cell_render border-box-sizing rendered_html"&gt;
+&lt;h3 id="Interpreting-the-results"&gt;Interpreting the results&lt;a class="anchor-link" href="#Interpreting-the-results"&gt;&amp;#182;&lt;/a&gt;&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;As you'll notice, we now have an additional &lt;code&gt;rdf:type&lt;/code&gt; associated with our &lt;code&gt;:non-typed-indv&lt;/code&gt; indicating that it is a &lt;code&gt;nidm:NIDM_0000054&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;This new type indicates that our object is a "Mask Map", but is that what we wanted? Possibly, but let's think about this a bit more...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When we are modeling a given domain in OWL it is important to know what inferences will come out of your design decisions. Here, the use of &lt;code&gt;rdfs:domain&lt;/code&gt; on an &lt;code&gt;owl:DatatypePropery&lt;/code&gt; caused us to infer specific type information simply by using the property.&lt;/p&gt;
+&lt;p&gt;In this case the property is for "noise FWHM In Verticies", which is pretty specific with the definition of:&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;"Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices."&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Any resource using this property, where the author read the definition, is probably in good shape to infer that this is likely a "Mask Map"; however, it is important to ask the question:&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;"Is there ever a situation where this property could be reasonably applied to an object that is not a Mask Map?"&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Possibly not, but inferring new types is not what I originally though of intuitively in the context of data modeling. My original expectation, from a modeling perspective using XSD or relational databases, is that &lt;code&gt;rdfs:domain&lt;/code&gt; would place a restriction that could be used to validate if this object indeed conforms to its type definition. This is clearly not the case with RDFS reasoning.&lt;/p&gt;
+&lt;p&gt;For validation with RDF models there is, surprisingly, no straightforward solution. Although there are a number of efforts in this space with &lt;a href="http://spinrdf.org"&gt;SPIN Rules&lt;/a&gt; and &lt;a href="http://www.w3.org/2001/sw/wiki/ShEx"&gt;ShEx RDF Shape Expressions&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Another avenue to explore in a future post is the use of &lt;a href="http://www.w3.org/TR/owl2-primer/#Property_Restrictions"&gt;OWL Property Restrictions&lt;/a&gt;&lt;/p&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Nolan Nichols</dc:creator><pubDate>Mon, 21 Sep 2015 00:00:00 -0700</pubDate><guid>tag:nolan-nichols.com,2015-09-21:rdfs-domain-inference.html</guid><category>semantic web</category><category>nidm</category><category>owl</category><category>rdf</category></item></channel></rss>

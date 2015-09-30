@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
     <title>nidm - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -189,9 +191,6 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
-
-
-
 </head>
 <body>
 
@@ -221,7 +220,7 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search.html">
+                <form class="navbar-search" action="/search">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
@@ -236,6 +235,7 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
+
             <article>
                 <h2><a href="http://nolan-nichols.com/ni2015.html">NIDM and NCANDA at Neuroinformatics 2015</a></h2>
                     <div class="well well-sm">
@@ -244,8 +244,6 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2015-09-21T00:00:00-07:00"> Mon 21 September 2015</time>
     </span>
-
-
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -265,6 +263,36 @@ Nolan Nichols            </a>
 </footer><!-- /.post-info -->                    </div>
                 <div class="summary"><p>A brief summary of my role at Neuroinformatics 2015 including the pre-meeting NIDM Workshop and a talk I presents during the investigator session.</p>
                     <a class="btn btn-default btn-xs" href="http://nolan-nichols.com/ni2015.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
+                <h2><a href="http://nolan-nichols.com/rdfs-domain-inference.html">Exploring RDFS Inference with Domain and Range</a></h2>
+                    <div class="well well-sm">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2015-09-21T00:00:00-07:00"> Mon 21 September 2015</time>
+    </span>
+            <span class="label label-default">By</span>
+            <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
+
+        <span class="label label-default">Category</span>
+        <a href="http://nolan-nichols.com/category/semantic-web.html">Semantic Web</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://nolan-nichols.com/tag/semantic-web.html">semantic web</a>
+        /
+	<a href="http://nolan-nichols.com/tag/nidm.html">nidm</a>
+        /
+	<a href="http://nolan-nichols.com/tag/owl.html">owl</a>
+        /
+	<a href="http://nolan-nichols.com/tag/rdf.html">rdf</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                <div class="summary"><p>A quick overview of RDFS reasoning when specifying the domain for a given property.</p>
+                    <a class="btn btn-default btn-xs" href="http://nolan-nichols.com/rdfs-domain-inference.html">more ...</a>
                 </div>
             </article>
             <hr/>
@@ -290,11 +318,18 @@ Nolan Nichols            </a>
                             <i class="fa fa-folder-open fa-lg"></i> Conferences
                         </a>
                     </li>
+                    <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/semantic-web.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Semantic Web
+                        </a>
+                    </li>
                 </ul>
             </li>
 
-
-
+            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group list-inline tagcloud" id="tags">
+                </ul>
+            </li>
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">

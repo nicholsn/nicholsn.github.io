@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
     <title>Search - Nolan Nichols
 </title>
@@ -189,9 +191,6 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
-
-
-
 </head>
 <body>
 
@@ -221,7 +220,7 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search.html">
+                <form class="navbar-search" action="/search">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
@@ -236,6 +235,7 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
+
 <div id="tipue_search_content"></div>
         </div>
         <div class="col-sm-3" id="sidebar">
@@ -258,11 +258,18 @@ Nolan Nichols            </a>
                             <i class="fa fa-folder-open fa-lg"></i> Conferences
                         </a>
                     </li>
+                    <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/semantic-web.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Semantic Web
+                        </a>
+                    </li>
                 </ul>
             </li>
 
-
-
+            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group list-inline tagcloud" id="tags">
+                </ul>
+            </li>
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">
@@ -357,6 +364,7 @@ Nolan Nichols            </a>
     </script>
     <!-- End Google Analytics Universal Code -->
 
+    <link href="http://nolan-nichols.com/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
     <script type="text/javascript" src="http://nolan-nichols.com/theme/tipuesearch/tipuesearch_set.js"></script>
     <script type="text/javascript" src="http://nolan-nichols.com/theme/tipuesearch/tipuesearch.min.js"></script>
     <script>
