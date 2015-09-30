@@ -14,7 +14,7 @@ TIMEZONE = "America/Vancouver"
 DEFAULT_LANG = "en"
 
 # Theme
-THEME = "pelican-bootstrap3"
+THEME = "/Users/nicholsn/Repos/pelican-themes/pelican-bootstrap3"
 
 # Theme specific config
 BOOTSTRAP_THEME = "slate"
@@ -51,7 +51,7 @@ LINKS = (('Pelican', 'http://getpelican.com/'),)
 TAG_CLOUD_MAX_ITEMS = 20
 DISPLAY_TAGS_ON_SIDEBAR = True
 DISPLAY_TAGS_INLINE = True
-DISPLAY_CATEGORIES_ON_SIDEBAR = True 
+DISPLAY_CATEGORIES_ON_SIDEBAR = True
 HIDE_SIDEBAR = False
 
 # Articles per page
@@ -59,7 +59,7 @@ DEFAULT_PAGINATION = 10
 RECENT_POST_COUNT = 5
 
 # Plugins
-PLUGIN_PATHS = ["/Users/nolan/Repos/pelican-plugins"]
+PLUGIN_PATHS = ["/Users/nicholsn/Repos/pelican-plugins"]
 PLUGINS = ['related_posts', 'tipue_search', 'liquid_tags.img',
            'liquid_tags.video', 'liquid_tags.youtube',
            'liquid_tags.vimeo', 'liquid_tags.include_code',

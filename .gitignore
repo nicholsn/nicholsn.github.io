@@ -3,6 +3,8 @@ output/*
 pelican.pid
 srv.pid
 cache/*
+.idea/*
+*.ipynb_checkpoints
 
 *.py[cod]
 
