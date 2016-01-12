@@ -40,6 +40,7 @@ USE_OPEN_GRAPH = True
 # Notebook Rendering
 NOTEBOOK_DIR = 'notebooks'
 EXTRA_HEADER = open('_nb_header.html').read().decode('utf-8')
+CUSTOM_CSS = 'static/custom.css'
 
 # Template settings
 DISPLAY_PAGES_ON_MENU = True
@@ -67,8 +68,11 @@ PLUGINS = ['related_posts', 'tipue_search', 'liquid_tags.img',
 
 # Static paths and cname mapping
 PATH = "content"
-STATIC_PATHS = ['images', 'extra/CNAME']
-EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'},}
+STATIC_PATHS = ['images', 'extra/CNAME', 'extra/custom.css']
+EXTRA_PATH_METADATA = {
+                       'extra/CNAME': {'path': 'CNAME'},
+                       'extra/custom.css': {'path': 'static/custom.css'}
+                       }
 PAGE_PATHS = ['pages']
 ARTICLE_PATHS = ['articles']
 ARTICLE_EXCLUDES = ['.']
