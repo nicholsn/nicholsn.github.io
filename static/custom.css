@@ -1,0 +1,13 @@
+div.input_area {
+  border: #272b30;
+  background: #272b30;
+}
+
+pre {
+  color: #93A1A1;
+  background-color: #002B36;
+}
+
+div.output_area {
+  margin-left: 6%;
+}
