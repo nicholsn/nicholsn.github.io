@@ -1,5 +1,5 @@
 Title: Exploring RDFS Inference with Domain and Range
-Date: 2015-09-21
+Date: 2015-09-28
 Category: Semantic Web
 Tags: semantic web, nidm, owl, rdf,
 Slug: rdfs-domain-inference
