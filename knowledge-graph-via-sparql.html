@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>RDFizing Results from the Google Knowledge Graph API - Nolan Nichols</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+<style type="text/css">
+
+/*some stuff for output/input prompts*/
+div.cell{border:1px solid transparent;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;display:flex;flex-direction:column;align-items:stretch}div.cell.selected{border-radius:4px;border:thin #ababab solid}
+div.cell.edit_mode{border-radius:4px;border:thin #008000 solid}
+div.cell{width:100%;padding:5px 5px 5px 0;margin:0;outline:none}
+div.prompt{min-width:11ex;padding:.4em;margin:0;font-family:monospace;text-align:right;line-height:1.21429em}
+@media (max-width:480px){div.prompt{text-align:left}}div.inner_cell{display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;display:flex;flex-direction:column;align-items:stretch;-webkit-box-flex:1;-moz-box-flex:1;box-flex:1;flex:1}
+div.input_area{border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;line-height:1.21429em}
+div.prompt:empty{padding-top:0;padding-bottom:0}
+div.input{page-break-inside:avoid;display:-webkit-box;-webkit-box-orient:horizontal;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:horizontal;-moz-box-align:stretch;display:box;box-orient:horizontal;box-align:stretch;}
+div.inner_cell{width:90%;}
+div.input_area{border:1px solid #cfcfcf;border-radius:4px;background:#f7f7f7;}
+div.input_prompt{color:navy;border-top:1px solid transparent;}
+div.output_wrapper{margin-top:5px;position:relative;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;width:100%;}
+div.output_scroll{height:24em;width:100%;overflow:auto;border-radius:4px;-webkit-box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);-moz-box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);box-shadow:inset 0 2px 8px rgba(0, 0, 0, 0.8);}
+div.output_collapsed{margin:0px;padding:0px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-box-align:stretch;display:-moz-box;-moz-box-orient:vertical;-moz-box-align:stretch;display:box;box-orient:vertical;box-align:stretch;width:100%;}
+div.out_prompt_overlay{height:100%;padding:0px 0.4em;position:absolute;border-radius:4px;}
+div.out_prompt_overlay:hover{-webkit-box-shadow:inset 0 0 1px #000000;-moz-box-shadow:inset 0 0 1px #000000;box-shadow:inset 0 0 1px #000000;background:rgba(240, 240, 240, 0.5);}
+div.output_prompt{color:darkred;}
+
+a.anchor-link:link{text-decoration:none;padding:0px 20px;visibility:hidden;}
+h1:hover .anchor-link,h2:hover .anchor-link,h3:hover .anchor-link,h4:hover .anchor-link,h5:hover .anchor-link,h6:hover .anchor-link{visibility:visible;}
+/* end stuff for output/input prompts*/
+
+
+.highlight-ipynb .hll { background-color: #ffffcc }
+.highlight-ipynb  { background: #f8f8f8; }
+.highlight-ipynb .c { color: #408080; font-style: italic } /* Comment */
+.highlight-ipynb .err { border: 1px solid #FF0000 } /* Error */
+.highlight-ipynb .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight-ipynb .o { color: #666666 } /* Operator */
+.highlight-ipynb .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight-ipynb .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight-ipynb .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight-ipynb .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight-ipynb .gd { color: #A00000 } /* Generic.Deleted */
+.highlight-ipynb .ge { font-style: italic } /* Generic.Emph */
+.highlight-ipynb .gr { color: #FF0000 } /* Generic.Error */
+.highlight-ipynb .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight-ipynb .gi { color: #00A000 } /* Generic.Inserted */
+.highlight-ipynb .go { color: #888888 } /* Generic.Output */
+.highlight-ipynb .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight-ipynb .gs { font-weight: bold } /* Generic.Strong */
+.highlight-ipynb .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight-ipynb .gt { color: #0044DD } /* Generic.Traceback */
+.highlight-ipynb .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight-ipynb .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight-ipynb .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight-ipynb .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight-ipynb .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight-ipynb .kt { color: #B00040 } /* Keyword.Type */
+.highlight-ipynb .m { color: #666666 } /* Literal.Number */
+.highlight-ipynb .s { color: #BA2121 } /* Literal.String */
+.highlight-ipynb .na { color: #7D9029 } /* Name.Attribute */
+.highlight-ipynb .nb { color: #008000 } /* Name.Builtin */
+.highlight-ipynb .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight-ipynb .no { color: #880000 } /* Name.Constant */
+.highlight-ipynb .nd { color: #AA22FF } /* Name.Decorator */
+.highlight-ipynb .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight-ipynb .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight-ipynb .nf { color: #0000FF } /* Name.Function */
+.highlight-ipynb .nl { color: #A0A000 } /* Name.Label */
+.highlight-ipynb .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight-ipynb .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight-ipynb .nv { color: #19177C } /* Name.Variable */
+.highlight-ipynb .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight-ipynb .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight-ipynb .mf { color: #666666 } /* Literal.Number.Float */
+.highlight-ipynb .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight-ipynb .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight-ipynb .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight-ipynb .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight-ipynb .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight-ipynb .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight-ipynb .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight-ipynb .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight-ipynb .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight-ipynb .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight-ipynb .sx { color: #008000 } /* Literal.String.Other */
+.highlight-ipynb .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight-ipynb .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight-ipynb .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight-ipynb .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight-ipynb .vc { color: #19177C } /* Name.Variable.Class */
+.highlight-ipynb .vg { color: #19177C } /* Name.Variable.Global */
+.highlight-ipynb .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight-ipynb .il { color: #666666 } /* Literal.Number.Integer.Long */
+</style>
+
+<style type="text/css">
+/* Overrides of notebook CSS for static HTML export */
+div.entry-content {
+  overflow: visible;
+  padding: 8px;
+}
+.input_area {
+  padding: 0.2em;
+}
+
+a.heading-anchor {
+ white-space: normal;
+}
+
+.rendered_html
+code {
+ font-size: .8em;
+}
+
+pre.ipynb {
+  color: black;
+  background: #f7f7f7;
+  border: none;
+  box-shadow: none;
+  margin-bottom: 0;
+  padding: 0;
+  margin: 0px;
+  font-size: 13px;
+}
+
+/* remove the prompt div from text cells */
+div.text_cell .prompt {
+    display: none;
+}
+
+/* remove horizontal padding from text cells, */
+/* so it aligns with outer body text */
+div.text_cell_render {
+    padding: 0.5em 0em;
+}
+
+img.anim_icon{padding:0; border:0; vertical-align:middle; -webkit-box-shadow:none; -box-shadow:none}
+</style>
+
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+<script type="text/javascript">
+init_mathjax = function() {
+    if (window.MathJax) {
+        // MathJax loaded
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+            },
+            displayAlign: 'left', // Change this to 'center' to center equations.
+            "HTML-CSS": {
+                styles: {'.MathJax_Display': {"margin": 0}}
+            }
+        });
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    }
+}
+init_mathjax();
+</script>
+    <link href="http://nolan-nichols.com/images/favicon.png" rel="icon">
+
+<link rel="canonical" href="http://nolan-nichols.com/knowledge-graph-via-sparql.html">
+
+        <meta name="author" content="Nolan Nichols" />
+        <meta name="keywords" content="semantic web,owl,rdf" />
+        <meta name="description" content="How to access the Google Knowledge Graph API as RDF using SPARQL" />
+
+        <meta property="og:site_name" content="Nolan Nichols" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="RDFizing Results from the Google Knowledge Graph API"/>
+        <meta property="og:url" content="http://nolan-nichols.com/knowledge-graph-via-sparql.html"/>
+        <meta property="og:description" content="How to access the Google Knowledge Graph API as RDF using SPARQL"/>
+        <meta property="article:published_time" content="2016-01-12" />
+            <meta property="article:section" content="Semantic Web" />
+            <meta property="article:tag" content="semantic web" />
+            <meta property="article:tag" content="owl" />
+            <meta property="article:tag" content="rdf" />
+            <meta property="article:author" content="Nolan Nichols" />
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://nolan-nichols.com/theme/css/bootstrap.slate.min.css" type="text/css"/>
+    <link href="http://nolan-nichols.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://nolan-nichols.com/theme/css/pygments/solarizeddark.css" rel="stylesheet">
+    <link href="http://nolan-nichols.com/theme/tipuesearch/tipuesearch.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://nolan-nichols.com/theme/css/style.css" type="text/css"/>
+
+        <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Nolan Nichols ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://nolan-nichols.com/" class="navbar-brand">
+Nolan Nichols            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://nolan-nichols.com/pages/about.html">
+                             About
+                          </a></li>
+                         <li><a href="http://nolan-nichols.com/pages/blog.html">
+                             Blog
+                          </a></li>
+                         <li><a href="http://nolan-nichols.com/pages/research.html">
+                             Research
+                          </a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><span>
+                <form class="navbar-search" action="/search">
+                  <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
+                </form></span>
+              </li>
+              <li><a href="http://nolan-nichols.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9">
+
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://nolan-nichols.com/knowledge-graph-via-sparql.html"
+                       rel="bookmark"
+                       title="Permalink to RDFizing Results from the Google Knowledge Graph API">
+                        RDFizing Results from the Google Knowledge Graph API
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2016-01-12T00:00:00-08:00"> Tue 12 January 2016</time>
+    </span>
+            <span class="label label-default">By</span>
+            <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
+
+        <span class="label label-default">Category</span>
+        <a href="http://nolan-nichols.com/category/semantic-web.html">Semantic Web</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://nolan-nichols.com/tag/semantic-web.html">semantic web</a>
+        /
+	<a href="http://nolan-nichols.com/tag/owl.html">owl</a>
+        /
+	<a href="http://nolan-nichols.com/tag/rdf.html">rdf</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h2><p>The Google Knowledge Graph Search API was recently made publicly <a href="https://developers.google.com/knowledge-graph/">available</a>. This API allows for the use of <a href="http://schema.org/">Schema.org</a> types to limit the scope of search results to entities that have been categorized as a given type.</p>
+<p>For example, a search may be limited to the schema.org type of "Person" or "TVSeries" to enhance the quality of search results. Interestingly, the format of the data that is returned is [JSON-LD/(<a href="http://json-ld.org/">http://json-ld.org/</a>) that provides a mapping between the JSON keys and URI's that include a unique and dereferencible identifier for clarifying the meaning of a given key.</p>
+<p>Further, JSON-LD (the LD is for Linked Data) is interoperable with the Resource Description Framework (<a href="https://www.w3.org/RDF/">RDF</a>) that offers a graph-based representation of knowledge based on subject-predicate-object "triples." For an API called 'Knowledge Graph" it makes sense to use a format that is compatible with this <a href="https://www.w3.org/">W3C</a> standard that underlies the Web's knowledge representation formalism: the Web Ontology Language (<a href="https://www.w3.org/TR/owl-features/">OWL</a>)</p>
+<p>What this buys us is the ability to use other W3C standards for working with the results of the Knowledge Graph, such as the <a href="https://www.w3.org/TR/sparql11-query/">SPARQL</a> Protocol and RDF Query Language. In this post, I am going to demonstrate how we can use a couple Python libraries to:</p>
+<ul>
+<li>access the Knowledge Graph API </li>
+<li>convert the JSON-LD results into RDF as a <a href="https://www.w3.org/TR/turtle/">Turtle</a> document</li>
+<li>query the RDF graph using SPARQL</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Python-Libraries">Python Libraries<a class="anchor-link" href="#Python-Libraries">&#182;</a></h2><p>First we need a few libraries for handling requests to the Knowledge Graoh API (requests), converting the JSON-LD results into RDF (pyld), and parsing the RDF into a queryable graph (rdflib). You can fnd these libraries at the links below:</p>
+<ul>
+<li>PyLD: <a href="https://github.com/digitalbazaar/pyld">https://github.com/digitalbazaar/pyld</a></li>
+<li>RDFLib: <a href="https://github.com/RDFLib/rdflib">https://github.com/RDFLib/rdflib</a></li>
+<li>Requests: <a href="https://github.com/kennethreitz/requests">https://github.com/kennethreitz/requests</a></li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[92]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">pyld</span>
+<span class="kn">import</span> <span class="nn">rdflib</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Accessing-the-Knowledge-Graph-API">Accessing the Knowledge Graph API<a class="anchor-link" href="#Accessing-the-Knowledge-Graph-API">&#182;</a></h2><p>Here we first need to obtain a key from the <a href="https://console.developers.google.com">Google Developers Console</a> and enable access. You won't see the Knowledge Graph API show up in the list of popular APIS, so you'll need to search for it in the API Manager. Once you enable the API and generate a key, you may need to add your IP address to the section on "Accept requests from these server IP addresses".</p>
+<p>Below, I've saved my key and read it in. For fun here, I am just searching the schema.org type of "TVSeries" for a cartoon series called "Archer" - of course you can search for something more serious, but one thing I found is that many of the schema.org types are not supported. For example, an error was raised when I searched for the schema.org type for "Drug", "Anatomical Structure", and "MedicalStudy".</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[94]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">kg_key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s">&#39;~&#39;</span><span class="p">),</span> <span class="s">&#39;.knowledge-graph-key&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;https://kgsearch.googleapis.com/v1/entities:search&quot;</span><span class="p">,</span> 
+                 <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s">&quot;Archer&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">kg_key</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s">&quot;TVSeries&quot;</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Parsing-the-and-Examining-the-Results">Parsing the and Examining the Results<a class="anchor-link" href="#Parsing-the-and-Examining-the-Results">&#182;</a></h2><p>This is pretty straight forward. We just parse the returned JSON-LD using the standard json library - note that JSON-LD can be treated as just plain old JSON.</p>
+<p>You can see in the results that the initial section includes an <code>@context</code> indicating the mapping between different vocabularies and a "key". There are a number of returned 'hits' and that each hit has associated with it a score. Here, the top score of '43.221546' is the TV Show we are interested in - Archer.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[100]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">jsonld</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{
+  &quot;@context&quot;: {
+    &quot;@vocab&quot;: &quot;http://schema.org/&quot;,
+    &quot;goog&quot;: &quot;http://schema.googleapis.com/&quot;,
+    &quot;EntitySearchResult&quot;: &quot;goog:EntitySearchResult&quot;,
+    &quot;detailedDescription&quot;: &quot;goog:detailedDescription&quot;,
+    &quot;resultScore&quot;: &quot;goog:resultScore&quot;,
+    &quot;kg&quot;: &quot;http://g.co/kg&quot;
+  },
+  &quot;@type&quot;: &quot;ItemList&quot;,
+  &quot;itemListElement&quot;: [
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/06_wvhl&quot;,
+        &quot;name&quot;: &quot;Archer&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;American animated series&quot;,
+        &quot;image&quot;: {
+          &quot;contentUrl&quot;: &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot;,
+          &quot;url&quot;: &quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot;,
+          &quot;license&quot;: &quot;http://creativecommons.org/licenses/by/2.0&quot;
+        },
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        },
+        &quot;url&quot;: &quot;http://www.fxnetworks.com/archer&quot;
+      },
+      &quot;resultScore&quot;: 43.221546
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/02qcfrx&quot;,
+        &quot;name&quot;: &quot;Spanish Archer&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;TV show&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Spanish Archer was a talent show hosted by Rhodri Williams and occasionally Ruth Madoc. It was produced by L!VE TV and filmed at the station&apos;s headquarters at Canary Wharf in London.\n&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Spanish_Archer&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 16.060818
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/07cggr0&quot;,
+        &quot;name&quot;: &quot;Archer (1975)&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;TV series&quot;
+      },
+      &quot;resultScore&quot;: 14.106644
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/06w21l8&quot;,
+        &quot;name&quot;: &quot;Meet Corliss Archer&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;American sitcom&quot;,
+        &quot;image&quot;: {
+          &quot;contentUrl&quot;: &quot;http://t2.gstatic.com/images?q=tbn:ANd9GcRqPkGi1_Rselb-ijqy_-5of6WsEkhDmoU036ZsvXBS83XZsWGb&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot;
+        },
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Meet Corliss Archer is an American sitcom that aired in syndication from April to December 1954. The series stars Ann Baker in the title role. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 12.145683
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0gfds00&quot;,
+        &quot;name&quot;: &quot;Jeffrey Archer: The Truth&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Movie&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;2002 film&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Jeffrey Archer: The Truth is a 2002 BBC satirical comedy drama on the life of Jeffrey Archer, with the title role played by Damian Lewis. Its duration was 90 minutes and its premiere occurred on 1 December 2002. It was written and directed by Guy Jenkin.&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Jeffrey_Archer:_The_Truth&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 11.167856
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/g/11cknytgw6&quot;,
+        &quot;name&quot;: &quot;Cassius &amp;amp; Clay&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Cassius &amp;amp; Clay is an upcoming American animated television series created by Adam Reed to be aired in 2016 alongside Archer on FXX. The show follows two women, Cassius and Clay living as bandits in a futuristic, post-apocalyptic America. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Cassius_%26_Clay&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.67782
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0bcr8s&quot;,
+        &quot;name&quot;: &quot;Robin Hood&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;British television programme&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Robin Hood is a British television programme, produced by independent production company Tiger Aspect Productions for BBC One, with co-funding from the BBC America cable television channel in the United States. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Robin_Hood_(2006_TV_series)&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        },
+        &quot;url&quot;: &quot;http://www.robin-hood.tv/&quot;
+      },
+      &quot;resultScore&quot;: 1.573618
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0cv8fbn&quot;,
+        &quot;name&quot;: &quot;Violet Tendencies&quot;,
+        &quot;@type&quot;: [
+          &quot;Movie&quot;,
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;2010 film&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Violet Tendencies is a 2010 romantic comedy film directed by Casper Andreas, written by Jesse Archer, and starring Mindy Cohn and Marcus Patrick. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Violet_Tendencies&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.50758
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0hzp2zq&quot;,
+        &quot;name&quot;: &quot;Animation Salvation&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;Television Program&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Animation Salvation is an Australian television Sunday night-time animation block aired on Fox8 on Sunday 7:30 pm to 10:30 pm from 7 March 2010.&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Animation_Salvation&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.371247
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0kfwmt7&quot;,
+        &quot;name&quot;: &quot;The Pirate&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Movie&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;1978 film&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;The Pirate is a 1978 American TV movie directed by Ken Annakin. It is based on the novel with the same title written by Harold Robbins.\nIt was broadcast by ABC in two parts November 21–22, 1978.&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/The_Pirate_(1978_film)&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.225814
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0522jn&quot;,
+        &quot;name&quot;: &quot;Major Dad&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;American sitcom&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Major Dad is an American sitcom created by Richard C. Okie and John G. Stephens, developed by Earl Pomerantz, that originally ran from 1989 to 1993 on CBS, starring Gerald McRaney as Major John D. MacGillis and Shanna Reed as his wife Polly. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Major_Dad&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.142771
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0264z1w&quot;,
+        &quot;name&quot;: &quot;The Dame Edna Experience&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;British television show&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;The Dame Edna Experience is a British television comedy talk-show hosted by Dame Edna Everage. It ran for twelve regular episodes on ITV, plus two Christmas specials.&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/The_Dame_Edna_Experience&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.123545
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/02qcyy2&quot;,
+        &quot;name&quot;: &quot;Footy Classified&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;Australian television program&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Footy Classified, is an Australian television program broadcast on the Nine Network which discusses pressing issues relating to AFL football. It debuted on Monday 2 April 2007. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Footy_Classified&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        },
+        &quot;url&quot;: &quot;http://wwos.ninemsn.com.au/afl/classified/&quot;
+      },
+      &quot;resultScore&quot;: 1.105602
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/04q8zth&quot;,
+        &quot;name&quot;: &quot;The Californians&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;Television Series&quot;,
+        &quot;image&quot;: {
+          &quot;contentUrl&quot;: &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcSQ0FvOFyPFq3qLlZsbr4UTcIef_WZFGTqQfVum3VzCxpykLMhK&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot;
+        },
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;The Californians is a 54-episode half-hour Western television series, set in the San Francisco gold rush of the 1850s, which aired on NBC from September 24, 1957, to May 26, 1959. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 1.043589
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0y5gfz0&quot;,
+        &quot;name&quot;: &quot;Roald Dahl&apos;s Esio Trot&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;,
+          &quot;Movie&quot;
+        ],
+        &quot;description&quot;: &quot;Television film&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Roald Dahl&apos;s Esio Trot is a British comedy television film that was first broadcast as part of BBC One&apos;s 2014 Christmas programming. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Roald_Dahl&apos;s_Esio_Trot&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 0.963223
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/07ch475&quot;,
+        &quot;name&quot;: &quot;Seventh Avenue&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Movie&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;American television miniseries&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Seventh Avenue is a six-part American television miniseries broadcast in 1977. It is based on the 1967 Norman Bogner novel of the same name. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Seventh_Avenue_(miniseries)&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 0.930134
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0k2dng7&quot;,
+        &quot;name&quot;: &quot;Help! My Supply Teacher&apos;s Magic&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;TV Show&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Help! My Supply Teacher&apos;s Magic is a CBBC show which shows magicians in schools, tricking children into thinking they are supply teachers. It is presented by Iain Stirling. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Help!_My_Supply_Teacher&apos;s_Magic&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 0.871172
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/0863kh&quot;,
+        &quot;name&quot;: &quot;Storefront Lawyers&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;American drama series&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Storefront Lawyers is an American legal drama that ran from September 1970 to April 1971 on CBS. The series stars Robert Foxworth, Sheila Larken, David Arkin, and A Martinez.&quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Storefront_Lawyers&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 0.871042
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/02rp2_&quot;,
+        &quot;name&quot;: &quot;The Big Read&quot;,
+        &quot;@type&quot;: [
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;Television Programme&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;The Big Read was a survey on books carried out by the BBC in the United Kingdom in 2003, where over three quarters of a million votes were received from the British public to find the nation&apos;s best-loved novel of all time. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/The_Big_Read&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 0.817672
+    },
+    {
+      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
+      &quot;result&quot;: {
+        &quot;@id&quot;: &quot;kg:/m/076vrw4&quot;,
+        &quot;name&quot;: &quot;Standing on the Edge of the Noise&quot;,
+        &quot;@type&quot;: [
+          &quot;Movie&quot;,
+          &quot;TVSeries&quot;,
+          &quot;Thing&quot;
+        ],
+        &quot;description&quot;: &quot;TV programme&quot;,
+        &quot;detailedDescription&quot;: {
+          &quot;articleBody&quot;: &quot;Standing on the Edge of the Noise is a unique, intimate look at Oasis performing in their own space, instead of the huge stadium stages on which they are more often seen. The programme includes a mix of classics and new tracks from Dig Out Your Soul. &quot;,
+          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Standing_on_the_Edge_of_the_Noise&quot;,
+          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        }
+      },
+      &quot;resultScore&quot;: 0.806576
+    }
+  ]
+}
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Conversion-to-RDF">Conversion to RDF<a class="anchor-link" href="#Conversion-to-RDF">&#182;</a></h2><p>Now, we can of course just parse the JSON object above using Python or test out our javascript skills, which is actually what makes JSON-LD nice - you can encode these Semantic Web ideas into an API without forcing developers to know anything about the <a href="http://bnode.org/blog/2009/07/08/the-semantic-web-not-a-piece-of-cake">Semantic Web Technology Stack</a>, shown below:</p>
+<p><img src="http://bnode.org/media/2009/07/08/semantic_web_technology_stack.png"></p>
+<p>To convert to RDF, we use the PyLD library and convert to a format called nquads that can include an additional URI in each RDF triple that indicates the graph that the triples belong to. Here there is no such graph, so only ntriples or n3 is output.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[101]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">normalized</span> <span class="o">=</span> <span class="n">pyld</span><span class="o">.</span><span class="n">jsonld</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">jsonld</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s">&#39;URDNA2015&#39;</span><span class="p">,</span> <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;application/nquads&#39;</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n4 .
+&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://schema.org/name&gt; &quot;Cassius &amp;amp; Clay&quot; .
+&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n35 .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.org/description&gt; &quot;British television show&quot; .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.org/name&gt; &quot;The Dame Edna Experience&quot; .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/02qcfrx&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n20 .
+&lt;http://g.co/kg/m/02qcfrx&gt; &lt;http://schema.org/description&gt; &quot;TV show&quot; .
+&lt;http://g.co/kg/m/02qcfrx&gt; &lt;http://schema.org/name&gt; &quot;Spanish Archer&quot; .
+&lt;http://g.co/kg/m/02qcfrx&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/02qcfrx&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/02qcyy2&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n21 .
+&lt;http://g.co/kg/m/02qcyy2&gt; &lt;http://schema.org/description&gt; &quot;Australian television program&quot; .
+&lt;http://g.co/kg/m/02qcyy2&gt; &lt;http://schema.org/name&gt; &quot;Footy Classified&quot; .
+&lt;http://g.co/kg/m/02qcyy2&gt; &lt;http://schema.org/url&gt; &quot;http://wwos.ninemsn.com.au/afl/classified/&quot; .
+&lt;http://g.co/kg/m/02qcyy2&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/02qcyy2&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/02rp2_&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n8 .
+&lt;http://g.co/kg/m/02rp2_&gt; &lt;http://schema.org/description&gt; &quot;Television Programme&quot; .
+&lt;http://g.co/kg/m/02rp2_&gt; &lt;http://schema.org/name&gt; &quot;The Big Read&quot; .
+&lt;http://g.co/kg/m/02rp2_&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/02rp2_&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/04q8zth&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n25 .
+&lt;http://g.co/kg/m/04q8zth&gt; &lt;http://schema.org/description&gt; &quot;Television Series&quot; .
+&lt;http://g.co/kg/m/04q8zth&gt; &lt;http://schema.org/image&gt; _:c14n1 .
+&lt;http://g.co/kg/m/04q8zth&gt; &lt;http://schema.org/name&gt; &quot;The Californians&quot; .
+&lt;http://g.co/kg/m/04q8zth&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/04q8zth&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0522jn&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n29 .
+&lt;http://g.co/kg/m/0522jn&gt; &lt;http://schema.org/description&gt; &quot;American sitcom&quot; .
+&lt;http://g.co/kg/m/0522jn&gt; &lt;http://schema.org/name&gt; &quot;Major Dad&quot; .
+&lt;http://g.co/kg/m/0522jn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0522jn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n31 .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/description&gt; &quot;American animated series&quot; .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/image&gt; _:c14n18 .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/name&gt; &quot;Archer&quot; .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/url&gt; &quot;http://www.fxnetworks.com/archer&quot; .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/06_wvhl&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/06w21l8&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n24 .
+&lt;http://g.co/kg/m/06w21l8&gt; &lt;http://schema.org/description&gt; &quot;American sitcom&quot; .
+&lt;http://g.co/kg/m/06w21l8&gt; &lt;http://schema.org/image&gt; _:c14n40 .
+&lt;http://g.co/kg/m/06w21l8&gt; &lt;http://schema.org/name&gt; &quot;Meet Corliss Archer&quot; .
+&lt;http://g.co/kg/m/06w21l8&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/06w21l8&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/076vrw4&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n19 .
+&lt;http://g.co/kg/m/076vrw4&gt; &lt;http://schema.org/description&gt; &quot;TV programme&quot; .
+&lt;http://g.co/kg/m/076vrw4&gt; &lt;http://schema.org/name&gt; &quot;Standing on the Edge of the Noise&quot; .
+&lt;http://g.co/kg/m/076vrw4&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .
+&lt;http://g.co/kg/m/076vrw4&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/076vrw4&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/07cggr0&gt; &lt;http://schema.org/description&gt; &quot;TV series&quot; .
+&lt;http://g.co/kg/m/07cggr0&gt; &lt;http://schema.org/name&gt; &quot;Archer (1975)&quot; .
+&lt;http://g.co/kg/m/07cggr0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/07cggr0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/07ch475&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n26 .
+&lt;http://g.co/kg/m/07ch475&gt; &lt;http://schema.org/description&gt; &quot;American television miniseries&quot; .
+&lt;http://g.co/kg/m/07ch475&gt; &lt;http://schema.org/name&gt; &quot;Seventh Avenue&quot; .
+&lt;http://g.co/kg/m/07ch475&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .
+&lt;http://g.co/kg/m/07ch475&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/07ch475&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0863kh&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n38 .
+&lt;http://g.co/kg/m/0863kh&gt; &lt;http://schema.org/description&gt; &quot;American drama series&quot; .
+&lt;http://g.co/kg/m/0863kh&gt; &lt;http://schema.org/name&gt; &quot;Storefront Lawyers&quot; .
+&lt;http://g.co/kg/m/0863kh&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0863kh&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0bcr8s&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n42 .
+&lt;http://g.co/kg/m/0bcr8s&gt; &lt;http://schema.org/description&gt; &quot;British television programme&quot; .
+&lt;http://g.co/kg/m/0bcr8s&gt; &lt;http://schema.org/name&gt; &quot;Robin Hood&quot; .
+&lt;http://g.co/kg/m/0bcr8s&gt; &lt;http://schema.org/url&gt; &quot;http://www.robin-hood.tv/&quot; .
+&lt;http://g.co/kg/m/0bcr8s&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0bcr8s&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0cv8fbn&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n22 .
+&lt;http://g.co/kg/m/0cv8fbn&gt; &lt;http://schema.org/description&gt; &quot;2010 film&quot; .
+&lt;http://g.co/kg/m/0cv8fbn&gt; &lt;http://schema.org/name&gt; &quot;Violet Tendencies&quot; .
+&lt;http://g.co/kg/m/0cv8fbn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .
+&lt;http://g.co/kg/m/0cv8fbn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0cv8fbn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0gfds00&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n6 .
+&lt;http://g.co/kg/m/0gfds00&gt; &lt;http://schema.org/description&gt; &quot;2002 film&quot; .
+&lt;http://g.co/kg/m/0gfds00&gt; &lt;http://schema.org/name&gt; &quot;Jeffrey Archer: The Truth&quot; .
+&lt;http://g.co/kg/m/0gfds00&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .
+&lt;http://g.co/kg/m/0gfds00&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0gfds00&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0hzp2zq&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n5 .
+&lt;http://g.co/kg/m/0hzp2zq&gt; &lt;http://schema.org/description&gt; &quot;Television Program&quot; .
+&lt;http://g.co/kg/m/0hzp2zq&gt; &lt;http://schema.org/name&gt; &quot;Animation Salvation&quot; .
+&lt;http://g.co/kg/m/0hzp2zq&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0hzp2zq&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0k2dng7&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n33 .
+&lt;http://g.co/kg/m/0k2dng7&gt; &lt;http://schema.org/description&gt; &quot;TV Show&quot; .
+&lt;http://g.co/kg/m/0k2dng7&gt; &lt;http://schema.org/name&gt; &quot;Help! My Supply Teacher&apos;s Magic&quot; .
+&lt;http://g.co/kg/m/0k2dng7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0k2dng7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0kfwmt7&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n17 .
+&lt;http://g.co/kg/m/0kfwmt7&gt; &lt;http://schema.org/description&gt; &quot;1978 film&quot; .
+&lt;http://g.co/kg/m/0kfwmt7&gt; &lt;http://schema.org/name&gt; &quot;The Pirate&quot; .
+&lt;http://g.co/kg/m/0kfwmt7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .
+&lt;http://g.co/kg/m/0kfwmt7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0kfwmt7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+&lt;http://g.co/kg/m/0y5gfz0&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n12 .
+&lt;http://g.co/kg/m/0y5gfz0&gt; &lt;http://schema.org/description&gt; &quot;Television film&quot; .
+&lt;http://g.co/kg/m/0y5gfz0&gt; &lt;http://schema.org/name&gt; &quot;Roald Dahl&apos;s Esio Trot&quot; .
+&lt;http://g.co/kg/m/0y5gfz0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .
+&lt;http://g.co/kg/m/0y5gfz0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
+&lt;http://g.co/kg/m/0y5gfz0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
+_:c14n0 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.2145683E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n0 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/06w21l8&gt; .
+_:c14n0 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n1 &lt;http://schema.org/contentUrl&gt; &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcSQ0FvOFyPFq3qLlZsbr4UTcIef_WZFGTqQfVum3VzCxpykLMhK&quot; .
+_:c14n1 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot; .
+_:c14n10 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.142771E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n10 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0522jn&gt; .
+_:c14n10 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n11 &lt;http://schema.googleapis.com/resultScore&gt; &quot;8.065760000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n11 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/076vrw4&gt; .
+_:c14n11 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n12 &lt;http://schema.org/articleBody&gt; &quot;Roald Dahl&apos;s Esio Trot is a British comedy television film that was first broadcast as part of BBC One&apos;s 2014 Christmas programming. &quot; .
+_:c14n12 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n12 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Roald_Dahl&apos;s_Esio_Trot&quot; .
+_:c14n13 &lt;http://schema.googleapis.com/resultScore&gt; &quot;8.176720000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n13 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/02rp2_&gt; .
+_:c14n13 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n14 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.123545E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n14 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0264z1w&gt; .
+_:c14n14 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n0 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n10 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n11 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n13 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n14 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n16 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n2 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n23 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n27 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n28 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n3 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n30 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n32 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n34 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n36 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n37 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n39 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n41 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n7 .
+_:c14n15 &lt;http://schema.org/itemListElement&gt; _:c14n9 .
+_:c14n15 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/ItemList&gt; .
+_:c14n16 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.573618E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n16 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0bcr8s&gt; .
+_:c14n16 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n17 &lt;http://schema.org/articleBody&gt; &quot;The Pirate is a 1978 American TV movie directed by Ken Annakin. It is based on the novel with the same title written by Harold Robbins.\nIt was broadcast by ABC in two parts November 21–22, 1978.&quot; .
+_:c14n17 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n17 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Pirate_(1978_film)&quot; .
+_:c14n18 &lt;http://schema.org/contentUrl&gt; &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot; .
+_:c14n18 &lt;http://schema.org/license&gt; &quot;http://creativecommons.org/licenses/by/2.0&quot; .
+_:c14n18 &lt;http://schema.org/url&gt; &quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot; .
+_:c14n19 &lt;http://schema.org/articleBody&gt; &quot;Standing on the Edge of the Noise is a unique, intimate look at Oasis performing in their own space, instead of the huge stadium stages on which they are more often seen. The programme includes a mix of classics and new tracks from Dig Out Your Soul. &quot; .
+_:c14n19 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n19 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Standing_on_the_Edge_of_the_Noise&quot; .
+_:c14n2 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.371247E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n2 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0hzp2zq&gt; .
+_:c14n2 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n20 &lt;http://schema.org/articleBody&gt; &quot;Spanish Archer was a talent show hosted by Rhodri Williams and occasionally Ruth Madoc. It was produced by L!VE TV and filmed at the station&apos;s headquarters at Canary Wharf in London.\n&quot; .
+_:c14n20 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n20 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Spanish_Archer&quot; .
+_:c14n21 &lt;http://schema.org/articleBody&gt; &quot;Footy Classified, is an Australian television program broadcast on the Nine Network which discusses pressing issues relating to AFL football. It debuted on Monday 2 April 2007. &quot; .
+_:c14n21 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n21 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Footy_Classified&quot; .
+_:c14n22 &lt;http://schema.org/articleBody&gt; &quot;Violet Tendencies is a 2010 romantic comedy film directed by Casper Andreas, written by Jesse Archer, and starring Mindy Cohn and Marcus Patrick. &quot; .
+_:c14n22 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n22 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Violet_Tendencies&quot; .
+_:c14n23 &lt;http://schema.googleapis.com/resultScore&gt; &quot;8.710420000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n23 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0863kh&gt; .
+_:c14n23 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n24 &lt;http://schema.org/articleBody&gt; &quot;Meet Corliss Archer is an American sitcom that aired in syndication from April to December 1954. The series stars Ann Baker in the title role. &quot; .
+_:c14n24 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n24 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot; .
+_:c14n25 &lt;http://schema.org/articleBody&gt; &quot;The Californians is a 54-episode half-hour Western television series, set in the San Francisco gold rush of the 1850s, which aired on NBC from September 24, 1957, to May 26, 1959. &quot; .
+_:c14n25 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n25 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot; .
+_:c14n26 &lt;http://schema.org/articleBody&gt; &quot;Seventh Avenue is a six-part American television miniseries broadcast in 1977. It is based on the 1967 Norman Bogner novel of the same name. &quot; .
+_:c14n26 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n26 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Seventh_Avenue_(miniseries)&quot; .
+_:c14n27 &lt;http://schema.googleapis.com/resultScore&gt; &quot;9.301340000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n27 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/07ch475&gt; .
+_:c14n27 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n28 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.1167856E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n28 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0gfds00&gt; .
+_:c14n28 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n29 &lt;http://schema.org/articleBody&gt; &quot;Major Dad is an American sitcom created by Richard C. Okie and John G. Stephens, developed by Earl Pomerantz, that originally ran from 1989 to 1993 on CBS, starring Gerald McRaney as Major John D. MacGillis and Shanna Reed as his wife Polly. &quot; .
+_:c14n29 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n29 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Major_Dad&quot; .
+_:c14n3 &lt;http://schema.googleapis.com/resultScore&gt; &quot;9.632230000000001E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n3 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0y5gfz0&gt; .
+_:c14n3 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n30 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.6060818E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n30 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/02qcfrx&gt; .
+_:c14n30 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n31 &lt;http://schema.org/articleBody&gt; &quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot; .
+_:c14n31 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n31 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot; .
+_:c14n32 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.225814E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n32 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0kfwmt7&gt; .
+_:c14n32 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n33 &lt;http://schema.org/articleBody&gt; &quot;Help! My Supply Teacher&apos;s Magic is a CBBC show which shows magicians in schools, tricking children into thinking they are supply teachers. It is presented by Iain Stirling. &quot; .
+_:c14n33 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n33 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Help!_My_Supply_Teacher&apos;s_Magic&quot; .
+_:c14n34 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.043589E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n34 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/04q8zth&gt; .
+_:c14n34 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n35 &lt;http://schema.org/articleBody&gt; &quot;The Dame Edna Experience is a British television comedy talk-show hosted by Dame Edna Everage. It ran for twelve regular episodes on ITV, plus two Christmas specials.&quot; .
+_:c14n35 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n35 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Dame_Edna_Experience&quot; .
+_:c14n36 &lt;http://schema.googleapis.com/resultScore&gt; &quot;4.3221546E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n36 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/06_wvhl&gt; .
+_:c14n36 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n37 &lt;http://schema.googleapis.com/resultScore&gt; &quot;8.711719999999999E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n37 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0k2dng7&gt; .
+_:c14n37 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n38 &lt;http://schema.org/articleBody&gt; &quot;Storefront Lawyers is an American legal drama that ran from September 1970 to April 1971 on CBS. The series stars Robert Foxworth, Sheila Larken, David Arkin, and A Martinez.&quot; .
+_:c14n38 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n38 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Storefront_Lawyers&quot; .
+_:c14n39 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.50758E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n39 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/0cv8fbn&gt; .
+_:c14n39 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n4 &lt;http://schema.org/articleBody&gt; &quot;Cassius &amp;amp; Clay is an upcoming American animated television series created by Adam Reed to be aired in 2016 alongside Archer on FXX. The show follows two women, Cassius and Clay living as bandits in a futuristic, post-apocalyptic America. &quot; .
+_:c14n4 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n4 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Cassius_%26_Clay&quot; .
+_:c14n40 &lt;http://schema.org/contentUrl&gt; &quot;http://t2.gstatic.com/images?q=tbn:ANd9GcRqPkGi1_Rselb-ijqy_-5of6WsEkhDmoU036ZsvXBS83XZsWGb&quot; .
+_:c14n40 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot; .
+_:c14n41 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.4106644E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n41 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/07cggr0&gt; .
+_:c14n41 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n42 &lt;http://schema.org/articleBody&gt; &quot;Robin Hood is a British television programme, produced by independent production company Tiger Aspect Productions for BBC One, with co-funding from the BBC America cable television channel in the United States. &quot; .
+_:c14n42 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n42 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Robin_Hood_(2006_TV_series)&quot; .
+_:c14n5 &lt;http://schema.org/articleBody&gt; &quot;Animation Salvation is an Australian television Sunday night-time animation block aired on Fox8 on Sunday 7:30 pm to 10:30 pm from 7 March 2010.&quot; .
+_:c14n5 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n5 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Animation_Salvation&quot; .
+_:c14n6 &lt;http://schema.org/articleBody&gt; &quot;Jeffrey Archer: The Truth is a 2002 BBC satirical comedy drama on the life of Jeffrey Archer, with the title role played by Damian Lewis. Its duration was 90 minutes and its premiere occurred on 1 December 2002. It was written and directed by Guy Jenkin.&quot; .
+_:c14n6 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n6 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Jeffrey_Archer:_The_Truth&quot; .
+_:c14n7 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.105602E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n7 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/m/02qcyy2&gt; .
+_:c14n7 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+_:c14n8 &lt;http://schema.org/articleBody&gt; &quot;The Big Read was a survey on books carried out by the BBC in the United Kingdom in 2003, where over three quarters of a million votes were received from the British public to find the nation&apos;s best-loved novel of all time. &quot; .
+_:c14n8 &lt;http://schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .
+_:c14n8 &lt;http://schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Big_Read&quot; .
+_:c14n9 &lt;http://schema.googleapis.com/resultScore&gt; &quot;1.67782E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .
+_:c14n9 &lt;http://schema.org/result&gt; &lt;http://g.co/kg/g/11cknytgw6&gt; .
+_:c14n9 &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Parse-the-RDF-into-a-Queryable-Graph">Parse the RDF into a Queryable Graph<a class="anchor-link" href="#Parse-the-RDF-into-a-Queryable-Graph">&#182;</a></h2><p>Next, we use the RDFLib library to parse this N3 data into a graph that we can then serialize into any of the RDF formats. In this case, I show an example of serializing into the Turtle format that is a bit easier to read. Note that RDF does not maintain any order of the triples that are output, so we no longer have our show listed as the first element. Also, you will see that the <code>@context</code> section is gone, being replaced with <code>@prefix</code> declarations for identifying the namespace from which terms come.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[103]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;n3&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>@prefix ns1: &lt;http://schema.org/&gt; .
+@prefix ns2: &lt;http://schema.googleapis.com/&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+&lt;http://g.co/kg/g/11cknytgw6&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Cassius &amp;amp; Clay is an upcoming American animated television series created by Adam Reed to be aired in 2016 alongside Archer on FXX. The show follows two women, Cassius and Clay living as bandits in a futuristic, post-apocalyptic America. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Cassius_%26_Clay&quot; ] ;
+    ns1:name &quot;Cassius &amp;amp; Clay&quot; .
+
+&lt;http://g.co/kg/m/0264z1w&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;The Dame Edna Experience is a British television comedy talk-show hosted by Dame Edna Everage. It ran for twelve regular episodes on ITV, plus two Christmas specials.&quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/The_Dame_Edna_Experience&quot; ] ;
+    ns1:description &quot;British television show&quot; ;
+    ns1:name &quot;The Dame Edna Experience&quot; .
+
+&lt;http://g.co/kg/m/02qcfrx&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;&quot;&quot;Spanish Archer was a talent show hosted by Rhodri Williams and occasionally Ruth Madoc. It was produced by L!VE TV and filmed at the station&apos;s headquarters at Canary Wharf in London.
+&quot;&quot;&quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Spanish_Archer&quot; ] ;
+    ns1:description &quot;TV show&quot; ;
+    ns1:name &quot;Spanish Archer&quot; .
+
+&lt;http://g.co/kg/m/02qcyy2&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Footy Classified, is an Australian television program broadcast on the Nine Network which discusses pressing issues relating to AFL football. It debuted on Monday 2 April 2007. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Footy_Classified&quot; ] ;
+    ns1:description &quot;Australian television program&quot; ;
+    ns1:name &quot;Footy Classified&quot; ;
+    ns1:url &quot;http://wwos.ninemsn.com.au/afl/classified/&quot; .
+
+&lt;http://g.co/kg/m/02rp2_&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;The Big Read was a survey on books carried out by the BBC in the United Kingdom in 2003, where over three quarters of a million votes were received from the British public to find the nation&apos;s best-loved novel of all time. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/The_Big_Read&quot; ] ;
+    ns1:description &quot;Television Programme&quot; ;
+    ns1:name &quot;The Big Read&quot; .
+
+&lt;http://g.co/kg/m/04q8zth&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;The Californians is a 54-episode half-hour Western television series, set in the San Francisco gold rush of the 1850s, which aired on NBC from September 24, 1957, to May 26, 1959. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot; ] ;
+    ns1:description &quot;Television Series&quot; ;
+    ns1:image [ ns1:contentUrl &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcSQ0FvOFyPFq3qLlZsbr4UTcIef_WZFGTqQfVum3VzCxpykLMhK&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot; ] ;
+    ns1:name &quot;The Californians&quot; .
+
+&lt;http://g.co/kg/m/0522jn&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Major Dad is an American sitcom created by Richard C. Okie and John G. Stephens, developed by Earl Pomerantz, that originally ran from 1989 to 1993 on CBS, starring Gerald McRaney as Major John D. MacGillis and Shanna Reed as his wife Polly. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Major_Dad&quot; ] ;
+    ns1:description &quot;American sitcom&quot; ;
+    ns1:name &quot;Major Dad&quot; .
+
+&lt;http://g.co/kg/m/06_wvhl&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot; ] ;
+    ns1:description &quot;American animated series&quot; ;
+    ns1:image [ ns1:contentUrl &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot; ;
+            ns1:license &quot;http://creativecommons.org/licenses/by/2.0&quot; ;
+            ns1:url &quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot; ] ;
+    ns1:name &quot;Archer&quot; ;
+    ns1:url &quot;http://www.fxnetworks.com/archer&quot; .
+
+&lt;http://g.co/kg/m/06w21l8&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Meet Corliss Archer is an American sitcom that aired in syndication from April to December 1954. The series stars Ann Baker in the title role. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot; ] ;
+    ns1:description &quot;American sitcom&quot; ;
+    ns1:image [ ns1:contentUrl &quot;http://t2.gstatic.com/images?q=tbn:ANd9GcRqPkGi1_Rselb-ijqy_-5of6WsEkhDmoU036ZsvXBS83XZsWGb&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot; ] ;
+    ns1:name &quot;Meet Corliss Archer&quot; .
+
+&lt;http://g.co/kg/m/076vrw4&gt; a ns1:Movie,
+        ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Standing on the Edge of the Noise is a unique, intimate look at Oasis performing in their own space, instead of the huge stadium stages on which they are more often seen. The programme includes a mix of classics and new tracks from Dig Out Your Soul. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Standing_on_the_Edge_of_the_Noise&quot; ] ;
+    ns1:description &quot;TV programme&quot; ;
+    ns1:name &quot;Standing on the Edge of the Noise&quot; .
+
+&lt;http://g.co/kg/m/07cggr0&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns1:description &quot;TV series&quot; ;
+    ns1:name &quot;Archer (1975)&quot; .
+
+&lt;http://g.co/kg/m/07ch475&gt; a ns1:Movie,
+        ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Seventh Avenue is a six-part American television miniseries broadcast in 1977. It is based on the 1967 Norman Bogner novel of the same name. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Seventh_Avenue_(miniseries)&quot; ] ;
+    ns1:description &quot;American television miniseries&quot; ;
+    ns1:name &quot;Seventh Avenue&quot; .
+
+&lt;http://g.co/kg/m/0863kh&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Storefront Lawyers is an American legal drama that ran from September 1970 to April 1971 on CBS. The series stars Robert Foxworth, Sheila Larken, David Arkin, and A Martinez.&quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Storefront_Lawyers&quot; ] ;
+    ns1:description &quot;American drama series&quot; ;
+    ns1:name &quot;Storefront Lawyers&quot; .
+
+&lt;http://g.co/kg/m/0bcr8s&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Robin Hood is a British television programme, produced by independent production company Tiger Aspect Productions for BBC One, with co-funding from the BBC America cable television channel in the United States. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Robin_Hood_(2006_TV_series)&quot; ] ;
+    ns1:description &quot;British television programme&quot; ;
+    ns1:name &quot;Robin Hood&quot; ;
+    ns1:url &quot;http://www.robin-hood.tv/&quot; .
+
+&lt;http://g.co/kg/m/0cv8fbn&gt; a ns1:Movie,
+        ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Violet Tendencies is a 2010 romantic comedy film directed by Casper Andreas, written by Jesse Archer, and starring Mindy Cohn and Marcus Patrick. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Violet_Tendencies&quot; ] ;
+    ns1:description &quot;2010 film&quot; ;
+    ns1:name &quot;Violet Tendencies&quot; .
+
+&lt;http://g.co/kg/m/0gfds00&gt; a ns1:Movie,
+        ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Jeffrey Archer: The Truth is a 2002 BBC satirical comedy drama on the life of Jeffrey Archer, with the title role played by Damian Lewis. Its duration was 90 minutes and its premiere occurred on 1 December 2002. It was written and directed by Guy Jenkin.&quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Jeffrey_Archer:_The_Truth&quot; ] ;
+    ns1:description &quot;2002 film&quot; ;
+    ns1:name &quot;Jeffrey Archer: The Truth&quot; .
+
+&lt;http://g.co/kg/m/0hzp2zq&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Animation Salvation is an Australian television Sunday night-time animation block aired on Fox8 on Sunday 7:30 pm to 10:30 pm from 7 March 2010.&quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Animation_Salvation&quot; ] ;
+    ns1:description &quot;Television Program&quot; ;
+    ns1:name &quot;Animation Salvation&quot; .
+
+&lt;http://g.co/kg/m/0k2dng7&gt; a ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Help! My Supply Teacher&apos;s Magic is a CBBC show which shows magicians in schools, tricking children into thinking they are supply teachers. It is presented by Iain Stirling. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Help!_My_Supply_Teacher&apos;s_Magic&quot; ] ;
+    ns1:description &quot;TV Show&quot; ;
+    ns1:name &quot;Help! My Supply Teacher&apos;s Magic&quot; .
+
+&lt;http://g.co/kg/m/0kfwmt7&gt; a ns1:Movie,
+        ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;&quot;&quot;The Pirate is a 1978 American TV movie directed by Ken Annakin. It is based on the novel with the same title written by Harold Robbins.
+It was broadcast by ABC in two parts November 21–22, 1978.&quot;&quot;&quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/The_Pirate_(1978_film)&quot; ] ;
+    ns1:description &quot;1978 film&quot; ;
+    ns1:name &quot;The Pirate&quot; .
+
+&lt;http://g.co/kg/m/0y5gfz0&gt; a ns1:Movie,
+        ns1:TVSeries,
+        ns1:Thing ;
+    ns2:detailedDescription [ ns1:articleBody &quot;Roald Dahl&apos;s Esio Trot is a British comedy television film that was first broadcast as part of BBC One&apos;s 2014 Christmas programming. &quot; ;
+            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
+            ns1:url &quot;http://en.wikipedia.org/wiki/Roald_Dahl&apos;s_Esio_Trot&quot; ] ;
+    ns1:description &quot;Television film&quot; ;
+    ns1:name &quot;Roald Dahl&apos;s Esio Trot&quot; .
+
+[] a ns1:ItemList ;
+    ns1:itemListElement [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.214568e+01 ;
+            ns1:result &lt;http://g.co/kg/m/06w21l8&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.142771e+00 ;
+            ns1:result &lt;http://g.co/kg/m/0522jn&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 8.06576e-01 ;
+            ns1:result &lt;http://g.co/kg/m/076vrw4&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 8.17672e-01 ;
+            ns1:result &lt;http://g.co/kg/m/02rp2_&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.123545e+00 ;
+            ns1:result &lt;http://g.co/kg/m/0264z1w&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.573618e+00 ;
+            ns1:result &lt;http://g.co/kg/m/0bcr8s&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.371247e+00 ;
+            ns1:result &lt;http://g.co/kg/m/0hzp2zq&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 8.71042e-01 ;
+            ns1:result &lt;http://g.co/kg/m/0863kh&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 9.30134e-01 ;
+            ns1:result &lt;http://g.co/kg/m/07ch475&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.116786e+01 ;
+            ns1:result &lt;http://g.co/kg/m/0gfds00&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 9.63223e-01 ;
+            ns1:result &lt;http://g.co/kg/m/0y5gfz0&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.606082e+01 ;
+            ns1:result &lt;http://g.co/kg/m/02qcfrx&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.225814e+00 ;
+            ns1:result &lt;http://g.co/kg/m/0kfwmt7&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.043589e+00 ;
+            ns1:result &lt;http://g.co/kg/m/04q8zth&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 4.322155e+01 ;
+            ns1:result &lt;http://g.co/kg/m/06_wvhl&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 8.71172e-01 ;
+            ns1:result &lt;http://g.co/kg/m/0k2dng7&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.50758e+00 ;
+            ns1:result &lt;http://g.co/kg/m/0cv8fbn&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.410664e+01 ;
+            ns1:result &lt;http://g.co/kg/m/07cggr0&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.105602e+00 ;
+            ns1:result &lt;http://g.co/kg/m/02qcyy2&gt; ],
+        [ a ns2:EntitySearchResult ;
+            ns2:resultScore 1.67782e+00 ;
+            ns1:result &lt;http://g.co/kg/g/11cknytgw6&gt; ] .
+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Querying-the-Knowlege-Graph-with-SPARQL">Querying the Knowlege Graph with SPARQL<a class="anchor-link" href="#Querying-the-Knowlege-Graph-with-SPARQL">&#182;</a></h2><p>Now that we have our graph loaded into RDFLib, we can issue a SPARQL query against it. Now this query is only being issued againts the results we returned from the API and not the entire Knowledge Graph, but it will give you a flavor for the query syntax.</p>
+<p>To break this down a little, We have four keywords to parse: SELECT, WHERE, ORDER BY DESC, and LIMIT. SELECT is simuilar to SQL and contains our, unituitively named, 'Projection' criteria or what we want returned to us as a table. The real meat is in the WHERE clause that provides our 'Selection' criteria using graph pattern matching on the triples in the graph. Here I am first looking up the the score of all the search results, then gathering the name, url, and an associated image. ORDER BY DESC allows us to sort our results with the highest score at the top and LIMIT just grabs the top results.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[117]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">q</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;SELECT ?name ?description ?url ?score ?image</span>
+<span class="s">       WHERE {?b a ns2:EntitySearchResult ;</span>
+<span class="s">                 ns2:resultScore ?score ;</span>
+<span class="s">                 ns1:result ?result .</span>
+<span class="s">              ?result ns1:description ?description ;</span>
+<span class="s">                      ns1:name ?name ;</span>
+<span class="s">                      ns1:url  ?url ;</span>
+<span class="s">                      ns1:image ?b_image .</span>
+<span class="s">              ?b_image ns1:contentUrl ?image .}</span>
+<span class="s">       ORDER BY DESC(?score)</span>
+<span class="s">       LIMIT 1</span>
+<span class="s">&quot;&quot;&quot;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;csv&#39;</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>name,description,url,score,image
+Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h2><p>So here I've shown how you can get started with converting data from the knowledge graph into RDF and query it using the SPARQL query language. This is only scratching the surface, as the real power of these technologies are to integrate diate from external sources. For example, as a next step we may want to query dbpedia using the URL we acquired here to gain additional information about actors or episodes and further explore the information retrieved as linked data. Of course here we are only looking at a TV Show, but as additional schema.org types are supported by the Knowledge Grpah API, I imagine that there will be links and hooks that enable searching across Drug databases and interoperating the data retrieved from Google, with more traditional sources of Linked Data from bioinformatics databases and forming a Giant Global Graph of linked data.</p>
+<p><img src="http://lod-cloud.net/versions/2014-08-30/lod-cloud.svg"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div></p>
+            </div>
+            <!-- /.entry-content -->
+<section class="well" id="related-posts">
+    <h4>Related Posts:</h4>
+    <ul>
+        <li><a href="http://nolan-nichols.com/rdfs-domain-inference.html">Exploring RDFS Inference with Domain and Range</a></li>
+    </ul>
+</section>
+    <hr />
+    <!-- AddThis Button BEGIN -->
+    <div class="addthis_toolbox addthis_default_style">
+            <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+            <a class="addthis_button_tweet"></a>
+            <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    </div>
+    <!-- AddThis Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'nicholsn'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'knowledge-graph-via-sparql';
+                var disqus_url = 'http://nolan-nichols.com/knowledge-graph-via-sparql.html';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+
+<section class="well well-sm">
+    <ul class="list-group list-group-flush">
+            <li class="list-group-item"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Social</span></h4>
+              <ul class="list-group" id="social">
+                <li class="list-group-item"><a href="https://github.com/nicholsn"><i class="fa fa-github-square fa-lg"></i> Github</a></li>
+                <li class="list-group-item"><a href="http://www.linkedin.com/in/nolannichols"><i class="fa fa-linkedin-square fa-lg"></i> LinkedIn</a></li>
+              </ul>
+            </li>
+
+
+            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Categories</span></h4></a>
+                <ul class="list-group" id="categories">
+                    <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/conferences.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Conferences
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/semantic-web.html">
+                            <i class="fa fa-folder-open fa-lg"></i> Semantic Web
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
+                <ul class="list-group list-inline tagcloud" id="tags">
+                </ul>
+            </li>
+
+    <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/nicholsn">@nicholsn</a> on GitHub
+    </li>
+    <li class="list-group-item"><h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+      <ul class="list-group" id="links">
+        <li class="list-group-item">
+            <a href="http://getpelican.com/" target="_blank">
+                Pelican
+            </a>
+        </li>
+      </ul>
+    </li>
+    </ul>
+</section>
+            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container-fluid">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2016 Nolan Nichols
+            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+    Content
+  licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>, except where indicated otherwise.
+</small></p>
+         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://nolan-nichols.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://nolan-nichols.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://nolan-nichols.com/theme/js/respond.min.js"></script>
+
+    <!-- GitHub JS -->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if (!window.jXHR) {
+                var jxhr = document.createElement('script');
+                jxhr.type = 'text/javascript';
+                jxhr.src = 'http://nolan-nichols.com/theme/js/jXHR.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(jxhr, s);
+            }
+
+            github.showRepos({
+                user: 'nicholsn',
+                count: 3,
+                skip_forks: true,
+                target: '#gh_repos'
+            });
+        });
+    </script>
+    <script src="http://nolan-nichols.com/theme/js/github.js" type="text/javascript"></script>
+    <!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'nicholsn'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-49888620-1', '');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55f098e034ebcb96"></script>
+</body>
+</html>
