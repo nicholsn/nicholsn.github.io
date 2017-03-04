@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nolan Nichols</title><link href="http://nolan-nichols.com/" rel="alternate"></link><link href="http://nolan-nichols.com/feeds/nolan-nichols.atom.xml" rel="self"></link><id>http://nolan-nichols.com/</id><updated>2016-06-25T00:00:00-07:00</updated><entry><title>Re-De-Centralizing Me</title><link href="http://nolan-nichols.com/re-de-centralizing-me.html" rel="alternate"></link><updated>2016-06-25T00:00:00-07:00</updated><author><name>Nolan Nichols</name></author><id>tag:nolan-nichols.com,2016-06-25:re-de-centralizing-me.html</id><summary type="html">&lt;h2&gt;Overview&lt;/h2&gt;
-&lt;p&gt;The word data now symbolizes something much greater than the abstract dealings
-of quants, statisticians, and data scientists. Our data, including my data, is
-no longer under our control, the data owner. We are being duped into giving up
-our data in payment for simple apps that our community could easily provide
-for free. Let's take back our data. Let's take back the ownership of our data,
-our life story. Here's how...&lt;/p&gt;</summary><category term="open science"></category><category term="decentralize"></category><category term="web"></category><category term="democracy"></category></entry><entry><title>RDFizing Results from the Google Knowledge Graph API</title><link href="http://nolan-nichols.com/knowledge-graph-via-sparql.html" rel="alternate"></link><updated>2016-01-12T00:00:00-08:00</updated><author><name>Nolan Nichols</name></author><id>tag:nolan-nichols.com,2016-01-12:knowledge-graph-via-sparql.html</id><summary type="html">&lt;p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nolan Nichols</title><link href="http://nolan-nichols.com/" rel="alternate"></link><link href="http://nolan-nichols.com/feeds/nolan-nichols.atom.xml" rel="self"></link><id>http://nolan-nichols.com/</id><updated>2016-01-12T00:00:00-08:00</updated><entry><title>RDFizing Results from the Google Knowledge Graph API</title><link href="http://nolan-nichols.com/knowledge-graph-via-sparql.html" rel="alternate"></link><updated>2016-01-12T00:00:00-08:00</updated><author><name>Nolan Nichols</name></author><id>tag:nolan-nichols.com,2016-01-12:knowledge-graph-via-sparql.html</id><summary type="html">&lt;p&gt;
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;

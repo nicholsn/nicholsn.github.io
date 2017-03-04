@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nolan Nichols</title><link>http://nolan-nichols.com/</link><description></description><atom:link href="http://nolan-nichols.com/feeds/nolan-nichols.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 25 Jun 2016 00:00:00 -0700</lastBuildDate><item><title>Re-De-Centralizing Me</title><link>http://nolan-nichols.com/re-de-centralizing-me.html</link><description>&lt;h2&gt;Overview&lt;/h2&gt;
-&lt;p&gt;The word data now symbolizes something much greater than the abstract dealings
-of quants, statisticians, and data scientists. Our data, including my data, is
-no longer under our control, the data owner. We are being duped into giving up
-our data in payment for simple apps that our community could easily provide
-for free. Let's take back our data. Let's take back the ownership of our data,
-our life story. Here's how...&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Nolan Nichols</dc:creator><pubDate>Sat, 25 Jun 2016 00:00:00 -0700</pubDate><guid>tag:nolan-nichols.com,2016-06-25:re-de-centralizing-me.html</guid><category>open science</category><category>decentralize</category><category>web</category><category>democracy</category></item><item><title>RDFizing Results from the Google Knowledge Graph API</title><link>http://nolan-nichols.com/knowledge-graph-via-sparql.html</link><description>&lt;p&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nolan Nichols</title><link>http://nolan-nichols.com/</link><description></description><atom:link href="http://nolan-nichols.com/feeds/nolan-nichols.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 12 Jan 2016 00:00:00 -0800</lastBuildDate><item><title>RDFizing Results from the Google Knowledge Graph API</title><link>http://nolan-nichols.com/knowledge-graph-via-sparql.html</link><description>&lt;p&gt;
 &lt;div class="cell border-box-sizing text_cell rendered"&gt;
 &lt;div class="prompt input_prompt"&gt;
 &lt;/div&gt;
