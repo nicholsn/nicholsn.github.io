@@ -38,7 +38,7 @@
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[92]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt;
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;json&lt;/span&gt;
 
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pyld&lt;/span&gt;
@@ -67,9 +67,9 @@
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[94]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;kg_key&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expanduser&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;~&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;.knowledge-graph-key&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;requests&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://kgsearch.googleapis.com/v1/entities:search&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
-                 &lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;dict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;query&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Archer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;kg_key&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;types&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;TVSeries&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;kg_key&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;os&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expanduser&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;~&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;.knowledge-graph-key&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;requests&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;https://kgsearch.googleapis.com/v1/entities:search&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
+                 &lt;span class="n"&gt;params&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;dict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;query&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Archer&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;key&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;kg_key&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;types&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;TVSeries&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -93,7 +93,7 @@
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[100]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;jsonld&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loads&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;jsonld&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loads&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;text&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -108,39 +108,39 @@
 &lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre&gt;{
-  &amp;quot;@context&amp;quot;: {
-    &amp;quot;@vocab&amp;quot;: &amp;quot;http://schema.org/&amp;quot;,
-    &amp;quot;goog&amp;quot;: &amp;quot;http://schema.googleapis.com/&amp;quot;,
-    &amp;quot;EntitySearchResult&amp;quot;: &amp;quot;goog:EntitySearchResult&amp;quot;,
-    &amp;quot;detailedDescription&amp;quot;: &amp;quot;goog:detailedDescription&amp;quot;,
-    &amp;quot;resultScore&amp;quot;: &amp;quot;goog:resultScore&amp;quot;,
-    &amp;quot;kg&amp;quot;: &amp;quot;http://g.co/kg&amp;quot;
+  &amp;#34;@context&amp;#34;: {
+    &amp;#34;@vocab&amp;#34;: &amp;#34;http://schema.org/&amp;#34;,
+    &amp;#34;goog&amp;#34;: &amp;#34;http://schema.googleapis.com/&amp;#34;,
+    &amp;#34;EntitySearchResult&amp;#34;: &amp;#34;goog:EntitySearchResult&amp;#34;,
+    &amp;#34;detailedDescription&amp;#34;: &amp;#34;goog:detailedDescription&amp;#34;,
+    &amp;#34;resultScore&amp;#34;: &amp;#34;goog:resultScore&amp;#34;,
+    &amp;#34;kg&amp;#34;: &amp;#34;http://g.co/kg&amp;#34;
   },
-  &amp;quot;@type&amp;quot;: &amp;quot;ItemList&amp;quot;,
-  &amp;quot;itemListElement&amp;quot;: [
+  &amp;#34;@type&amp;#34;: &amp;#34;ItemList&amp;#34;,
+  &amp;#34;itemListElement&amp;#34;: [
     {
-      &amp;quot;@type&amp;quot;: &amp;quot;EntitySearchResult&amp;quot;,
-      &amp;quot;result&amp;quot;: {
-        &amp;quot;@id&amp;quot;: &amp;quot;kg:/m/06_wvhl&amp;quot;,
-        &amp;quot;name&amp;quot;: &amp;quot;Archer&amp;quot;,
-        &amp;quot;@type&amp;quot;: [
-          &amp;quot;TVSeries&amp;quot;,
-          &amp;quot;Thing&amp;quot;
+      &amp;#34;@type&amp;#34;: &amp;#34;EntitySearchResult&amp;#34;,
+      &amp;#34;result&amp;#34;: {
+        &amp;#34;@id&amp;#34;: &amp;#34;kg:/m/06_wvhl&amp;#34;,
+        &amp;#34;name&amp;#34;: &amp;#34;Archer&amp;#34;,
+        &amp;#34;@type&amp;#34;: [
+          &amp;#34;TVSeries&amp;#34;,
+          &amp;#34;Thing&amp;#34;
         ],
-        &amp;quot;description&amp;quot;: &amp;quot;American animated series&amp;quot;,
-        &amp;quot;image&amp;quot;: {
-          &amp;quot;contentUrl&amp;quot;: &amp;quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&amp;quot;,
-          &amp;quot;url&amp;quot;: &amp;quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&amp;quot;,
-          &amp;quot;license&amp;quot;: &amp;quot;http://creativecommons.org/licenses/by/2.0&amp;quot;
+        &amp;#34;description&amp;#34;: &amp;#34;American animated series&amp;#34;,
+        &amp;#34;image&amp;#34;: {
+          &amp;#34;contentUrl&amp;#34;: &amp;#34;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&amp;#34;,
+          &amp;#34;url&amp;#34;: &amp;#34;https://en.wikipedia.org/wiki/Archer_(TV_series)&amp;#34;,
+          &amp;#34;license&amp;#34;: &amp;#34;http://creativecommons.org/licenses/by/2.0&amp;#34;
         },
-        &amp;quot;detailedDescription&amp;quot;: {
-          &amp;quot;articleBody&amp;quot;: &amp;quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &amp;quot;,
-          &amp;quot;url&amp;quot;: &amp;quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&amp;quot;,
-          &amp;quot;license&amp;quot;: &amp;quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&amp;quot;
+        &amp;#34;detailedDescription&amp;#34;: {
+          &amp;#34;articleBody&amp;#34;: &amp;#34;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &amp;#34;,
+          &amp;#34;url&amp;#34;: &amp;#34;http://en.wikipedia.org/wiki/Archer_(TV_series)&amp;#34;,
+          &amp;#34;license&amp;#34;: &amp;#34;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&amp;#34;
         },
-        &amp;quot;url&amp;quot;: &amp;quot;http://www.fxnetworks.com/archer&amp;quot;
+        &amp;#34;url&amp;#34;: &amp;#34;http://www.fxnetworks.com/archer&amp;#34;
       },
-      &amp;quot;resultScore&amp;quot;: 43.221546
+      &amp;#34;resultScore&amp;#34;: 43.221546
     },
 ...
 &lt;/pre&gt;
@@ -168,7 +168,7 @@
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[101]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;normalized&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pyld&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jsonld&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;normalize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jsonld&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;algorithm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;URDNA2015&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;format&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;application/nquads&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;normalized&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pyld&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jsonld&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;normalize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jsonld&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;algorithm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;URDNA2015&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;format&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;application/nquads&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;})&lt;/span&gt;
 &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;normalized&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -183,12 +183,12 @@
 &lt;div class="output_area"&gt;&lt;div class="prompt"&gt;&lt;/div&gt;
 &lt;div class="output_subarea output_stream output_stdout output_text"&gt;
 &lt;pre&gt;&amp;lt;http://g.co/kg/g/11cknytgw6&amp;gt; &amp;lt;http://schema.googleapis.com/detailedDescription&amp;gt; _:c14n4 .
-&amp;lt;http://g.co/kg/g/11cknytgw6&amp;gt; &amp;lt;http://schema.org/name&amp;gt; &amp;quot;Cassius &amp;amp;amp; Clay&amp;quot; .
+&amp;lt;http://g.co/kg/g/11cknytgw6&amp;gt; &amp;lt;http://schema.org/name&amp;gt; &amp;#34;Cassius &amp;amp;amp; Clay&amp;#34; .
 &amp;lt;http://g.co/kg/g/11cknytgw6&amp;gt; &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&amp;gt; &amp;lt;http://schema.org/TVSeries&amp;gt; .
 &amp;lt;http://g.co/kg/g/11cknytgw6&amp;gt; &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&amp;gt; &amp;lt;http://schema.org/Thing&amp;gt; .
 &amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://schema.googleapis.com/detailedDescription&amp;gt; _:c14n35 .
-&amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://schema.org/description&amp;gt; &amp;quot;British television show&amp;quot; .
-&amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://schema.org/name&amp;gt; &amp;quot;The Dame Edna Experience&amp;quot; .
+&amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://schema.org/description&amp;gt; &amp;#34;British television show&amp;#34; .
+&amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://schema.org/name&amp;gt; &amp;#34;The Dame Edna Experience&amp;#34; .
 &amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&amp;gt; &amp;lt;http://schema.org/TVSeries&amp;gt; .
 &amp;lt;http://g.co/kg/m/0264z1w&amp;gt; &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&amp;gt; &amp;lt;http://schema.org/Thing&amp;gt; .
 &amp;lt;http://g.co/kg/m/02qcfrx&amp;gt; &amp;lt;http://schema.googleapis.com/detailedDescription&amp;gt; _:c14n20 .
@@ -216,9 +216,9 @@
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[103]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rdflib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Graph&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;normalized&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;n3&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rdflib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Graph&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;normalized&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;n3&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -240,15 +240,15 @@
 
 &amp;lt;http://g.co/kg/m/06_wvhl&amp;gt; a ns1:TVSeries,
         ns1:Thing ;
-    ns2:detailedDescription [ ns1:articleBody &amp;quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &amp;quot; ;
-            ns1:license &amp;quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&amp;quot; ;
-            ns1:url &amp;quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&amp;quot; ] ;
-    ns1:description &amp;quot;American animated series&amp;quot; ;
-    ns1:image [ ns1:contentUrl &amp;quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&amp;quot; ;
-            ns1:license &amp;quot;http://creativecommons.org/licenses/by/2.0&amp;quot; ;
-            ns1:url &amp;quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&amp;quot; ] ;
-    ns1:name &amp;quot;Archer&amp;quot; ;
-    ns1:url &amp;quot;http://www.fxnetworks.com/archer&amp;quot; .
+    ns2:detailedDescription [ ns1:articleBody &amp;#34;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &amp;#34; ;
+            ns1:license &amp;#34;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&amp;#34; ;
+            ns1:url &amp;#34;http://en.wikipedia.org/wiki/Archer_(TV_series)&amp;#34; ] ;
+    ns1:description &amp;#34;American animated series&amp;#34; ;
+    ns1:image [ ns1:contentUrl &amp;#34;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&amp;#34; ;
+            ns1:license &amp;#34;http://creativecommons.org/licenses/by/2.0&amp;#34; ;
+            ns1:url &amp;#34;https://en.wikipedia.org/wiki/Archer_(TV_series)&amp;#34; ] ;
+    ns1:name &amp;#34;Archer&amp;#34; ;
+    ns1:url &amp;#34;http://www.fxnetworks.com/archer&amp;#34; .
 
 [] a ns1:ItemList ;
     ns1:itemListElement [ a ns2:EntitySearchResult ;
@@ -283,19 +283,19 @@
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[117]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;q&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;SELECT ?name ?description ?url ?score ?image&lt;/span&gt;
-&lt;span class="s"&gt;       WHERE {?b a ns2:EntitySearchResult ;&lt;/span&gt;
-&lt;span class="s"&gt;                 ns2:resultScore ?score ;&lt;/span&gt;
-&lt;span class="s"&gt;                 ns1:result ?result .&lt;/span&gt;
-&lt;span class="s"&gt;              ?result ns1:description ?description ;&lt;/span&gt;
-&lt;span class="s"&gt;                      ns1:name ?name ;&lt;/span&gt;
-&lt;span class="s"&gt;                      ns1:url  ?url ;&lt;/span&gt;
-&lt;span class="s"&gt;                      ns1:image ?b_image .&lt;/span&gt;
-&lt;span class="s"&gt;              ?b_image ns1:contentUrl ?image .}&lt;/span&gt;
-&lt;span class="s"&gt;       ORDER BY DESC(?score)&lt;/span&gt;
-&lt;span class="s"&gt;       LIMIT 1&lt;/span&gt;
-&lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;csv&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;q&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;SELECT ?name ?description ?url ?score ?image&lt;/span&gt;
+&lt;span class="s2"&gt;       WHERE {?b a ns2:EntitySearchResult ;&lt;/span&gt;
+&lt;span class="s2"&gt;                 ns2:resultScore ?score ;&lt;/span&gt;
+&lt;span class="s2"&gt;                 ns1:result ?result .&lt;/span&gt;
+&lt;span class="s2"&gt;              ?result ns1:description ?description ;&lt;/span&gt;
+&lt;span class="s2"&gt;                      ns1:name ?name ;&lt;/span&gt;
+&lt;span class="s2"&gt;                      ns1:url  ?url ;&lt;/span&gt;
+&lt;span class="s2"&gt;                      ns1:image ?b_image .&lt;/span&gt;
+&lt;span class="s2"&gt;              ?b_image ns1:contentUrl ?image .}&lt;/span&gt;
+&lt;span class="s2"&gt;       ORDER BY DESC(?score)&lt;/span&gt;
+&lt;span class="s2"&gt;       LIMIT 1&lt;/span&gt;
+&lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;csv&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -335,7 +335,7 @@ Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http:
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[&amp;nbsp;]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt; 
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt; 
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -384,7 +384,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[1]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;rdflib&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;rdflib&lt;/span&gt;
 &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;RDFClosure&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -411,7 +411,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[2]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rdflib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Graph&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rdflib&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Graph&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -424,14 +424,14 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[3]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;ttl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;@prefix : &amp;lt;#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;         @prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;         @prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;         @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;         @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;         &lt;/span&gt;
-&lt;span class="s"&gt;         :non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .&lt;/span&gt;
-&lt;span class="s"&gt;      &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;ttl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;@prefix : &amp;lt;#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;         @prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;         @prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;         @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;         @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;         &lt;/span&gt;
+&lt;span class="s2"&gt;         :non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .&lt;/span&gt;
+&lt;span class="s2"&gt;      &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -444,7 +444,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[4]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ttl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;ttl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -459,7 +459,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
-&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;apos;rdflib.graph.Graph&amp;apos;&amp;gt;)&amp;gt;&lt;/pre&gt;
+&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;#39;rdflib.graph.Graph&amp;#39;&amp;gt;)&amp;gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
@@ -473,7 +473,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[5]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -492,7 +492,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
 @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
 
-:non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .
+:non-typed-indv rdfs:label &amp;#34;Example Subject with no rdf:type information.&amp;#34; .
 
 
 &lt;/pre&gt;
@@ -523,25 +523,25 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[6]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;owl&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;    @prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;owl&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix rdf: &amp;lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix rdfs: &amp;lt;http://www.w3.org/2000/01/rdf-schema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix obo: &amp;lt;http://purl.obolibrary.org/obo/&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;    @prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .&lt;/span&gt;
 
-&lt;span class="s"&gt;    nidm:NIDM_0000054 rdf:type owl:Class ;&lt;/span&gt;
-&lt;span class="s"&gt;                      rdfs:label &amp;quot;Mask Map&amp;quot; ;&lt;/span&gt;
-&lt;span class="s"&gt;                      obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .&lt;/span&gt;
-&lt;span class="s"&gt;                    &lt;/span&gt;
-&lt;span class="s"&gt;    nidm:NIDM_0000158 rdf:type owl:DatatypeProperty ;&lt;/span&gt;
-&lt;span class="s"&gt;                  rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;                  &lt;/span&gt;
-&lt;span class="s"&gt;                  rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;&lt;/span&gt;
-&lt;span class="s"&gt;                  obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;                  &lt;/span&gt;
-&lt;span class="s"&gt;                  rdfs:domain nidm:NIDM_0000054 .&lt;/span&gt;
-&lt;span class="s"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s2"&gt;    nidm:NIDM_0000054 rdf:type owl:Class ;&lt;/span&gt;
+&lt;span class="s2"&gt;                      rdfs:label &amp;quot;Mask Map&amp;quot; ;&lt;/span&gt;
+&lt;span class="s2"&gt;                      obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .&lt;/span&gt;
+&lt;span class="s2"&gt;                    &lt;/span&gt;
+&lt;span class="s2"&gt;    nidm:NIDM_0000158 rdf:type owl:DatatypeProperty ;&lt;/span&gt;
+&lt;span class="s2"&gt;                  rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;                  &lt;/span&gt;
+&lt;span class="s2"&gt;                  rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;&lt;/span&gt;
+&lt;span class="s2"&gt;                  obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;                  &lt;/span&gt;
+&lt;span class="s2"&gt;                  rdfs:domain nidm:NIDM_0000054 .&lt;/span&gt;
+&lt;span class="s2"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -554,7 +554,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[7]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;owl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;owl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -569,7 +569,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
-&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;apos;rdflib.graph.Graph&amp;apos;&amp;gt;)&amp;gt;&lt;/pre&gt;
+&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;#39;rdflib.graph.Graph&amp;#39;&amp;gt;)&amp;gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
@@ -583,7 +583,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[8]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -605,17 +605,17 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip&lt;/code&gt;&lt;
 @prefix xml: &amp;lt;http://www.w3.org/XML/1998/namespace&amp;gt; .
 @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
 
-:non-typed-indv rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .
+:non-typed-indv rdfs:label &amp;#34;Example Subject with no rdf:type information.&amp;#34; .
 
 nidm:NIDM_0000158 a owl:DatatypeProperty ;
-    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
-    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:label &amp;#34;noise FWHM In Vertices&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;#34; ;
+    rdfs:comment &amp;#34;Range: Vector of positive floats.&amp;#34; ;
     rdfs:domain nidm:NIDM_0000054 .
 
 nidm:NIDM_0000054 a owl:Class ;
-    rdfs:label &amp;quot;Mask Map&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+    rdfs:label &amp;#34;Mask Map&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;#34; .
 
 
 &lt;/pre&gt;
@@ -644,7 +644,7 @@ nidm:NIDM_0000054 a owl:Class ;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[9]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;rdfs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;RDFClosure&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DeductiveClosure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RDFClosure&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RDFS_Semantics&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;rdfs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;RDFClosure&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DeductiveClosure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RDFClosure&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RDFS_Semantics&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;rdfs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -658,7 +658,7 @@ nidm:NIDM_0000054 a owl:Class ;
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[10]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -681,13 +681,13 @@ nidm:NIDM_0000054 a owl:Class ;
 @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
 
 :non-typed-indv a rdfs:Resource ;
-    rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; .
+    rdfs:label &amp;#34;Example Subject with no rdf:type information.&amp;#34; .
 
 nidm:NIDM_0000158 a rdfs:Resource,
         owl:DatatypeProperty ;
-    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
-    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:label &amp;#34;noise FWHM In Vertices&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;#34; ;
+    rdfs:comment &amp;#34;Range: Vector of positive floats.&amp;#34; ;
     rdfs:domain nidm:NIDM_0000054 .
 
 rdfs:Literal a rdfs:Resource .
@@ -697,8 +697,8 @@ obo:IAO_0000115 a rdf:Property ;
 
 nidm:NIDM_0000054 a rdfs:Resource,
         owl:Class ;
-    rdfs:label &amp;quot;Mask Map&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+    rdfs:label &amp;#34;Mask Map&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;#34; .
 
 rdf:type a rdf:Property ;
     rdfs:subPropertyOf rdf:type .
@@ -759,12 +759,12 @@ owl:DatatypeProperty a rdfs:Resource .
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[11]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;datatype&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-&lt;span class="s"&gt;           @prefix : &amp;lt;#&amp;gt; .&lt;/span&gt;
-&lt;span class="s"&gt;           @prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;datatype&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s2"&gt;           @prefix : &amp;lt;#&amp;gt; .&lt;/span&gt;
+&lt;span class="s2"&gt;           @prefix nidm: &amp;lt;http://purl.org/nidash/nidm#&amp;gt; .&lt;/span&gt;
 
-&lt;span class="s"&gt;           :non-typed-indv nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .&lt;/span&gt;
-&lt;span class="s"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="s2"&gt;           :non-typed-indv nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .&lt;/span&gt;
+&lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -777,7 +777,7 @@ owl:DatatypeProperty a rdfs:Resource .
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[12]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;datatype&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;datatype&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -792,7 +792,7 @@ owl:DatatypeProperty a rdfs:Resource .
 
 
 &lt;div class="output_text output_subarea output_execute_result"&gt;
-&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;apos;rdflib.graph.Graph&amp;apos;&amp;gt;)&amp;gt;&lt;/pre&gt;
+&lt;pre&gt;&amp;lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&amp;lt;class &amp;#39;rdflib.graph.Graph&amp;#39;&amp;gt;)&amp;gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;/div&gt;
@@ -806,7 +806,7 @@ owl:DatatypeProperty a rdfs:Resource .
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[13]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -829,14 +829,14 @@ owl:DatatypeProperty a rdfs:Resource .
 @prefix xsd: &amp;lt;http://www.w3.org/2001/XMLSchema#&amp;gt; .
 
 :non-typed-indv a rdfs:Resource ;
-    rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; ;
-    nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .
+    rdfs:label &amp;#34;Example Subject with no rdf:type information.&amp;#34; ;
+    nidm:NIDM_0000158 &amp;#34;[2.95, 2.96, 2.61]&amp;#34; .
 
 nidm:NIDM_0000158 a rdfs:Resource,
         owl:DatatypeProperty ;
-    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
-    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:label &amp;#34;noise FWHM In Vertices&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;#34; ;
+    rdfs:comment &amp;#34;Range: Vector of positive floats.&amp;#34; ;
     rdfs:domain nidm:NIDM_0000054 .
 
 rdfs:Literal a rdfs:Resource .
@@ -846,8 +846,8 @@ obo:IAO_0000115 a rdf:Property ;
 
 nidm:NIDM_0000054 a rdfs:Resource,
         owl:Class ;
-    rdfs:label &amp;quot;Mask Map&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+    rdfs:label &amp;#34;Mask Map&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;#34; .
 
 rdf:type a rdf:Property ;
     rdfs:subPropertyOf rdf:type .
@@ -894,8 +894,8 @@ owl:DatatypeProperty a rdfs:Resource .
 &lt;div class="prompt input_prompt"&gt;In&amp;nbsp;[14]:&lt;/div&gt;
 &lt;div class="inner_cell"&gt;
     &lt;div class="input_area"&gt;
-&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span class="n"&gt;rdfs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class=" highlight hl-ipython2"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;rdfs&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;expand&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;serialize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;turtle&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 &lt;/div&gt;
@@ -919,8 +919,8 @@ owl:DatatypeProperty a rdfs:Resource .
 
 :non-typed-indv a nidm:NIDM_0000054,
         rdfs:Resource ;
-    rdfs:label &amp;quot;Example Subject with no rdf:type information.&amp;quot; ;
-    nidm:NIDM_0000158 &amp;quot;[2.95, 2.96, 2.61]&amp;quot; .
+    rdfs:label &amp;#34;Example Subject with no rdf:type information.&amp;#34; ;
+    nidm:NIDM_0000158 &amp;#34;[2.95, 2.96, 2.61]&amp;#34; .
 
 rdfs:Literal a rdfs:Resource .
 
@@ -931,9 +931,9 @@ obo:IAO_0000115 a rdf:Property,
 nidm:NIDM_0000158 a rdf:Property,
         rdfs:Resource,
         owl:DatatypeProperty ;
-    rdfs:label &amp;quot;noise FWHM In Vertices&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;quot; ;
-    rdfs:comment &amp;quot;Range: Vector of positive floats.&amp;quot; ;
+    rdfs:label &amp;#34;noise FWHM In Vertices&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&amp;#34; ;
+    rdfs:comment &amp;#34;Range: Vector of positive floats.&amp;#34; ;
     rdfs:domain nidm:NIDM_0000054 ;
     rdfs:subPropertyOf nidm:NIDM_0000158 .
 
@@ -963,8 +963,8 @@ owl:DatatypeProperty a rdfs:Resource .
 
 nidm:NIDM_0000054 a rdfs:Resource,
         owl:Class ;
-    rdfs:label &amp;quot;Mask Map&amp;quot; ;
-    obo:IAO_0000115 &amp;quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;quot; .
+    rdfs:label &amp;#34;Mask Map&amp;#34; ;
+    obo:IAO_0000115 &amp;#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&amp;#34; .
 
 rdf:Property a rdfs:Resource .
 

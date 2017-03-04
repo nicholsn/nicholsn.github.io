@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:og="http://ogp.me/ns#"
-      xmlns:fb="https://www.facebook.com/2008/fbml">
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
     <title>Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -191,6 +189,9 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
+
+
+
 </head>
 <body>
 
@@ -220,11 +221,10 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search">
+                <form class="navbar-search" action="/search.html">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
-              <li><a href="http://nolan-nichols.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -235,7 +235,38 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
+            <article>
+                <h2><a href="http://nolan-nichols.com/re-de-centralizing-me.html">Re-De-Centralizing Me</a></h2>
+                    <div class="well well-sm">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2016-06-25T00:00:00-07:00"> Sat 25 June 2016</time>
+    </span>
 
+
+            <span class="label label-default">By</span>
+            <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
+
+        <span class="label label-default">Category</span>
+        <a href="http://nolan-nichols.com/category/decentralize.html">decentralize</a>
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://nolan-nichols.com/tag/open-science.html">open science</a>
+        /
+	<a href="http://nolan-nichols.com/tag/decentralize.html">decentralize</a>
+        /
+	<a href="http://nolan-nichols.com/tag/web.html">web</a>
+        /
+	<a href="http://nolan-nichols.com/tag/democracy.html">democracy</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                <div class="summary"><p>Thoughts one how I can retake ownership of MY data that is on the Web.</p>
+                    <a class="btn btn-default btn-xs" href="http://nolan-nichols.com/re-de-centralizing-me.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
             <article>
                 <h2><a href="http://nolan-nichols.com/knowledge-graph-via-sparql.html">RDFizing Results from the Google Knowledge Graph API</a></h2>
                     <div class="well well-sm">
@@ -244,6 +275,8 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2016-01-12T00:00:00-08:00"> Tue 12 January 2016</time>
     </span>
+
+
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -272,6 +305,8 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2015-09-28T00:00:00-07:00"> Mon 28 September 2015</time>
     </span>
+
+
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -302,6 +337,8 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2015-09-21T00:00:00-07:00"> Mon 21 September 2015</time>
     </span>
+
+
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -347,6 +384,11 @@ Nolan Nichols            </a>
                         </a>
                     </li>
                     <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/decentralize.html">
+                            <i class="fa fa-folder-open fa-lg"></i> decentralize
+                        </a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="http://nolan-nichols.com/category/semantic-web.html">
                             <i class="fa fa-folder-open fa-lg"></i> Semantic Web
                         </a>
@@ -354,10 +396,8 @@ Nolan Nichols            </a>
                 </ul>
             </li>
 
-            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
-                <ul class="list-group list-inline tagcloud" id="tags">
-                </ul>
-            </li>
+
+
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">
@@ -385,7 +425,7 @@ Nolan Nichols            </a>
       <hr>
       <div class="row">
          <div class="col-xs-10">&copy; 2016 Nolan Nichols
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     Content

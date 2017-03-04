@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:og="http://ogp.me/ns#"
-      xmlns:fb="https://www.facebook.com/2008/fbml">
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
     <title>Exploring RDFS Inference with Domain and Range - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -200,6 +198,11 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
+
+
+        <link href="http://nolan-nichols.com/feeds/semantic-web.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Nolan Nichols Semantic Web ATOM Feed"/>
+
 </head>
 <body>
 
@@ -229,11 +232,10 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search">
+                <form class="navbar-search" action="/search.html">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
-              <li><a href="http://nolan-nichols.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -244,7 +246,6 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
-
     <section id="content">
         <article>
             <header class="page-header">
@@ -264,6 +265,8 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2015-09-28T00:00:00-07:00"> Mon 28 September 2015</time>
     </span>
+
+
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -324,7 +327,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">rdflib</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">rdflib</span>
 <span class="kn">import</span> <span class="nn">RDFClosure</span>
 </pre></div>
 
@@ -351,7 +354,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -364,14 +367,14 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">ttl</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;@prefix : &lt;#&gt; .</span>
-<span class="s">         @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
-<span class="s">         @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .</span>
-<span class="s">         @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .</span>
-<span class="s">         @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .</span>
-<span class="s">         </span>
-<span class="s">         :non-typed-indv rdfs:label &quot;Example Subject with no rdf:type information.&quot; .</span>
-<span class="s">      &quot;&quot;&quot;</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ttl</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;@prefix : &lt;#&gt; .</span>
+<span class="s2">         @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
+<span class="s2">         @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .</span>
+<span class="s2">         @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .</span>
+<span class="s2">         @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .</span>
+<span class="s2">         </span>
+<span class="s2">         :non-typed-indv rdfs:label &quot;Example Subject with no rdf:type information.&quot; .</span>
+<span class="s2">      &quot;&quot;&quot;</span>
 </pre></div>
 
 </div>
@@ -384,7 +387,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ttl</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ttl</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -399,7 +402,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &apos;rdflib.graph.Graph&apos;&gt;)&gt;</pre>
+<pre>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &#39;rdflib.graph.Graph&#39;&gt;)&gt;</pre>
 </div>
 
 </div>
@@ -413,7 +416,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -432,7 +435,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 
-:non-typed-indv rdfs:label &quot;Example Subject with no rdf:type information.&quot; .
+:non-typed-indv rdfs:label &#34;Example Subject with no rdf:type information.&#34; .
 
 
 </pre>
@@ -463,25 +466,25 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">owl</span><span class="o">=</span><span class="s">&quot;&quot;&quot;</span>
-<span class="s">    @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
-<span class="s">    @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .</span>
-<span class="s">    @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .</span>
-<span class="s">    @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .</span>
-<span class="s">    @prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .</span>
-<span class="s">    @prefix obo: &lt;http://purl.obolibrary.org/obo/&gt; .</span>
-<span class="s">    @prefix nidm: &lt;http://purl.org/nidash/nidm#&gt; .</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">owl</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
+<span class="s2">    @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .</span>
+<span class="s2">    @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .</span>
+<span class="s2">    @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .</span>
+<span class="s2">    @prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .</span>
+<span class="s2">    @prefix obo: &lt;http://purl.obolibrary.org/obo/&gt; .</span>
+<span class="s2">    @prefix nidm: &lt;http://purl.org/nidash/nidm#&gt; .</span>
 
-<span class="s">    nidm:NIDM_0000054 rdf:type owl:Class ;</span>
-<span class="s">                      rdfs:label &quot;Mask Map&quot; ;</span>
-<span class="s">                      obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .</span>
-<span class="s">                    </span>
-<span class="s">    nidm:NIDM_0000158 rdf:type owl:DatatypeProperty ;</span>
-<span class="s">                  rdfs:label &quot;noise FWHM In Vertices&quot; ;                  </span>
-<span class="s">                  rdfs:comment &quot;Range: Vector of positive floats.&quot; ;</span>
-<span class="s">                  obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;                  </span>
-<span class="s">                  rdfs:domain nidm:NIDM_0000054 .</span>
-<span class="s">    &quot;&quot;&quot;</span>
+<span class="s2">    nidm:NIDM_0000054 rdf:type owl:Class ;</span>
+<span class="s2">                      rdfs:label &quot;Mask Map&quot; ;</span>
+<span class="s2">                      obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .</span>
+<span class="s2">                    </span>
+<span class="s2">    nidm:NIDM_0000158 rdf:type owl:DatatypeProperty ;</span>
+<span class="s2">                  rdfs:label &quot;noise FWHM In Vertices&quot; ;                  </span>
+<span class="s2">                  rdfs:comment &quot;Range: Vector of positive floats.&quot; ;</span>
+<span class="s2">                  obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;                  </span>
+<span class="s2">                  rdfs:domain nidm:NIDM_0000054 .</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 </pre></div>
 
 </div>
@@ -494,7 +497,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">owl</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">owl</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -509,7 +512,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &apos;rdflib.graph.Graph&apos;&gt;)&gt;</pre>
+<pre>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &#39;rdflib.graph.Graph&#39;&gt;)&gt;</pre>
 </div>
 
 </div>
@@ -523,7 +526,7 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -545,17 +548,17 @@ pip install https://github.com/RDFLib/OWL-RL/archive/master.zip</code></pre>
 @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 
-:non-typed-indv rdfs:label &quot;Example Subject with no rdf:type information.&quot; .
+:non-typed-indv rdfs:label &#34;Example Subject with no rdf:type information.&#34; .
 
 nidm:NIDM_0000158 a owl:DatatypeProperty ;
-    rdfs:label &quot;noise FWHM In Vertices&quot; ;
-    obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;
-    rdfs:comment &quot;Range: Vector of positive floats.&quot; ;
+    rdfs:label &#34;noise FWHM In Vertices&#34; ;
+    obo:IAO_0000115 &#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&#34; ;
+    rdfs:comment &#34;Range: Vector of positive floats.&#34; ;
     rdfs:domain nidm:NIDM_0000054 .
 
 nidm:NIDM_0000054 a owl:Class ;
-    rdfs:label &quot;Mask Map&quot; ;
-    obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .
+    rdfs:label &#34;Mask Map&#34; ;
+    obo:IAO_0000115 &#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&#34; .
 
 
 </pre>
@@ -584,7 +587,7 @@ nidm:NIDM_0000054 a owl:Class ;
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">rdfs</span> <span class="o">=</span> <span class="n">RDFClosure</span><span class="o">.</span><span class="n">DeductiveClosure</span><span class="p">(</span><span class="n">RDFClosure</span><span class="o">.</span><span class="n">RDFS_Semantics</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rdfs</span> <span class="o">=</span> <span class="n">RDFClosure</span><span class="o">.</span><span class="n">DeductiveClosure</span><span class="p">(</span><span class="n">RDFClosure</span><span class="o">.</span><span class="n">RDFS_Semantics</span><span class="p">)</span>
 <span class="n">rdfs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 </pre></div>
 
@@ -598,7 +601,7 @@ nidm:NIDM_0000054 a owl:Class ;
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -621,13 +624,13 @@ nidm:NIDM_0000054 a owl:Class ;
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 
 :non-typed-indv a rdfs:Resource ;
-    rdfs:label &quot;Example Subject with no rdf:type information.&quot; .
+    rdfs:label &#34;Example Subject with no rdf:type information.&#34; .
 
 nidm:NIDM_0000158 a rdfs:Resource,
         owl:DatatypeProperty ;
-    rdfs:label &quot;noise FWHM In Vertices&quot; ;
-    obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;
-    rdfs:comment &quot;Range: Vector of positive floats.&quot; ;
+    rdfs:label &#34;noise FWHM In Vertices&#34; ;
+    obo:IAO_0000115 &#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&#34; ;
+    rdfs:comment &#34;Range: Vector of positive floats.&#34; ;
     rdfs:domain nidm:NIDM_0000054 .
 
 rdfs:Literal a rdfs:Resource .
@@ -637,8 +640,8 @@ obo:IAO_0000115 a rdf:Property ;
 
 nidm:NIDM_0000054 a rdfs:Resource,
         owl:Class ;
-    rdfs:label &quot;Mask Map&quot; ;
-    obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .
+    rdfs:label &#34;Mask Map&#34; ;
+    obo:IAO_0000115 &#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&#34; .
 
 rdf:type a rdf:Property ;
     rdfs:subPropertyOf rdf:type .
@@ -699,12 +702,12 @@ owl:DatatypeProperty a rdfs:Resource .
 <div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">datatype</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
-<span class="s">           @prefix : &lt;#&gt; .</span>
-<span class="s">           @prefix nidm: &lt;http://purl.org/nidash/nidm#&gt; .</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">datatype</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">           @prefix : &lt;#&gt; .</span>
+<span class="s2">           @prefix nidm: &lt;http://purl.org/nidash/nidm#&gt; .</span>
 
-<span class="s">           :non-typed-indv nidm:NIDM_0000158 &quot;[2.95, 2.96, 2.61]&quot; .</span>
-<span class="s">&quot;&quot;&quot;</span>
+<span class="s2">           :non-typed-indv nidm:NIDM_0000158 &quot;[2.95, 2.96, 2.61]&quot; .</span>
+<span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
 </div>
@@ -717,7 +720,7 @@ owl:DatatypeProperty a rdfs:Resource .
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">datatype</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">datatype</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -732,7 +735,7 @@ owl:DatatypeProperty a rdfs:Resource .
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &apos;rdflib.graph.Graph&apos;&gt;)&gt;</pre>
+<pre>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &#39;rdflib.graph.Graph&#39;&gt;)&gt;</pre>
 </div>
 
 </div>
@@ -746,7 +749,7 @@ owl:DatatypeProperty a rdfs:Resource .
 <div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -769,14 +772,14 @@ owl:DatatypeProperty a rdfs:Resource .
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 
 :non-typed-indv a rdfs:Resource ;
-    rdfs:label &quot;Example Subject with no rdf:type information.&quot; ;
-    nidm:NIDM_0000158 &quot;[2.95, 2.96, 2.61]&quot; .
+    rdfs:label &#34;Example Subject with no rdf:type information.&#34; ;
+    nidm:NIDM_0000158 &#34;[2.95, 2.96, 2.61]&#34; .
 
 nidm:NIDM_0000158 a rdfs:Resource,
         owl:DatatypeProperty ;
-    rdfs:label &quot;noise FWHM In Vertices&quot; ;
-    obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;
-    rdfs:comment &quot;Range: Vector of positive floats.&quot; ;
+    rdfs:label &#34;noise FWHM In Vertices&#34; ;
+    obo:IAO_0000115 &#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&#34; ;
+    rdfs:comment &#34;Range: Vector of positive floats.&#34; ;
     rdfs:domain nidm:NIDM_0000054 .
 
 rdfs:Literal a rdfs:Resource .
@@ -786,8 +789,8 @@ obo:IAO_0000115 a rdf:Property ;
 
 nidm:NIDM_0000054 a rdfs:Resource,
         owl:Class ;
-    rdfs:label &quot;Mask Map&quot; ;
-    obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .
+    rdfs:label &#34;Mask Map&#34; ;
+    obo:IAO_0000115 &#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&#34; .
 
 rdf:type a rdf:Property ;
     rdfs:subPropertyOf rdf:type .
@@ -834,8 +837,8 @@ owl:DatatypeProperty a rdfs:Resource .
 <div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">rdfs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
-<span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">rdfs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -859,8 +862,8 @@ owl:DatatypeProperty a rdfs:Resource .
 
 :non-typed-indv a nidm:NIDM_0000054,
         rdfs:Resource ;
-    rdfs:label &quot;Example Subject with no rdf:type information.&quot; ;
-    nidm:NIDM_0000158 &quot;[2.95, 2.96, 2.61]&quot; .
+    rdfs:label &#34;Example Subject with no rdf:type information.&#34; ;
+    nidm:NIDM_0000158 &#34;[2.95, 2.96, 2.61]&#34; .
 
 rdfs:Literal a rdfs:Resource .
 
@@ -871,9 +874,9 @@ obo:IAO_0000115 a rdf:Property,
 nidm:NIDM_0000158 a rdf:Property,
         rdfs:Resource,
         owl:DatatypeProperty ;
-    rdfs:label &quot;noise FWHM In Vertices&quot; ;
-    obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;
-    rdfs:comment &quot;Range: Vector of positive floats.&quot; ;
+    rdfs:label &#34;noise FWHM In Vertices&#34; ;
+    obo:IAO_0000115 &#34;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&#34; ;
+    rdfs:comment &#34;Range: Vector of positive floats.&#34; ;
     rdfs:domain nidm:NIDM_0000054 ;
     rdfs:subPropertyOf nidm:NIDM_0000158 .
 
@@ -903,8 +906,8 @@ owl:DatatypeProperty a rdfs:Resource .
 
 nidm:NIDM_0000054 a rdfs:Resource,
         owl:Class ;
-    rdfs:label &quot;Mask Map&quot; ;
-    obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .
+    rdfs:label &#34;Mask Map&#34; ;
+    obo:IAO_0000115 &#34;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&#34; .
 
 rdf:Property a rdfs:Resource .
 
@@ -1014,6 +1017,11 @@ rdfs:Resource a rdfs:Resource .
                         </a>
                     </li>
                     <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/decentralize.html">
+                            <i class="fa fa-folder-open fa-lg"></i> decentralize
+                        </a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="http://nolan-nichols.com/category/semantic-web.html">
                             <i class="fa fa-folder-open fa-lg"></i> Semantic Web
                         </a>
@@ -1021,10 +1029,8 @@ rdfs:Resource a rdfs:Resource .
                 </ul>
             </li>
 
-            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
-                <ul class="list-group list-inline tagcloud" id="tags">
-                </ul>
-            </li>
+
+
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">
@@ -1052,7 +1058,7 @@ rdfs:Resource a rdfs:Resource .
       <hr>
       <div class="row">
          <div class="col-xs-10">&copy; 2016 Nolan Nichols
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     Content

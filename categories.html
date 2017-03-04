@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:og="http://ogp.me/ns#"
-      xmlns:fb="https://www.facebook.com/2008/fbml">
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
     <title>Categories - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -191,6 +189,9 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
+
+
+
 </head>
 <body>
 
@@ -220,11 +221,10 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search">
+                <form class="navbar-search" action="/search.html">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
-              <li><a href="http://nolan-nichols.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -235,7 +235,6 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
-
     <section id="categories">
         <h1>All Categories for Nolan Nichols</h1>
         <div class="panel-group" id="accordion">
@@ -248,6 +247,18 @@ Nolan Nichols            </a>
                 <div id="collapse-conferences" class="panel-collapse collapse">
                     <div class="panel-body">
                         <p><span class="categories-timestamp"><time datetime="2015-09-21T00:00:00-07:00">Mon 21 September 2015</time></span> <a href="http://nolan-nichols.com/ni2015.html">NIDM and NCANDA at Neuroinformatics 2015</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse-decentralize">decentralize <span class="badge pull-right">1</span></a>
+                    </h4>
+                </div>
+                <div id="collapse-decentralize" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <p><span class="categories-timestamp"><time datetime="2016-06-25T00:00:00-07:00">Sat 25 June 2016</time></span> <a href="http://nolan-nichols.com/re-de-centralizing-me.html">Re-De-Centralizing Me</a></p>
                     </div>
                 </div>
             </div>
@@ -289,6 +300,11 @@ Nolan Nichols            </a>
                         </a>
                     </li>
                     <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/decentralize.html">
+                            <i class="fa fa-folder-open fa-lg"></i> decentralize
+                        </a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="http://nolan-nichols.com/category/semantic-web.html">
                             <i class="fa fa-folder-open fa-lg"></i> Semantic Web
                         </a>
@@ -296,10 +312,8 @@ Nolan Nichols            </a>
                 </ul>
             </li>
 
-            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
-                <ul class="list-group list-inline tagcloud" id="tags">
-                </ul>
-            </li>
+
+
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">
@@ -327,7 +341,7 @@ Nolan Nichols            </a>
       <hr>
       <div class="row">
          <div class="col-xs-10">&copy; 2016 Nolan Nichols
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     Content

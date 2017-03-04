@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:og="http://ogp.me/ns#"
-      xmlns:fb="https://www.facebook.com/2008/fbml">
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
     <title> - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -171,13 +169,13 @@ init_mathjax();
 <link rel="canonical" href="http://nolan-nichols.com/">
 
         <meta name="author" content="Nolan Nichols <http://orcid.org/0000-0003-1099-3328>" />
-        <meta name="description" content="Nolan Nichols, Ph.D. Postdoctoral Fellow Neuroscience Program SRI International Menlo Park, CA 94025 nolan.nichols (at) gmail.com" />
+        <meta name="description" content="Nolan Nichols, Ph.D. Bioinformatics Software Engineer Genentech, Inc. San Francisco Bay Area, CA nolan.nichols (at) gmail.com" />
 
     <meta property="og:site_name" content="Nolan Nichols" />
     <meta property="og:type" content="article"/>
     <meta property="og:title" content=""/>
     <meta property="og:url" content="http://nolan-nichols.com/"/>
-    <meta property="og:description" content="Nolan Nichols, Ph.D. Postdoctoral Fellow Neuroscience Program SRI International Menlo Park, CA 94025 nolan.nichols (at) gmail.com" />
+    <meta property="og:description" content="Nolan Nichols, Ph.D. Bioinformatics Software Engineer Genentech, Inc. San Francisco Bay Area, CA nolan.nichols (at) gmail.com" />
 
 
     <!-- Bootstrap -->
@@ -191,6 +189,9 @@ init_mathjax();
 
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
+
+
+
 
 </head>
 <body>
@@ -221,11 +222,10 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search">
+                <form class="navbar-search" action="/search.html">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
-              <li><a href="http://nolan-nichols.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -236,9 +236,7 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
-
     <section id="content" class="body">
-        <h1 class="entry-title"></h1>
         
         <div class="entry-content">
             <table>
@@ -247,10 +245,9 @@ Nolan Nichols            </a>
         <img src="./images/nolan.png"></br>
         </br>
         Nolan Nichols, Ph.D.</br>
-        Postdoctoral Fellow</br>
-        Neuroscience Program</br>
-        SRI International</br>
-        Menlo Park, CA 94025</br>
+        Bioinformatics Software Engineer</br>
+        Genentech, Inc.</br>
+        San Francisco Bay Area, CA</br>
         <a href="mailto:nolan.nichols@gmail.com">nolan.nichols (at) gmail.com</a>
       </td>
       <td style="padding: 25px;">
@@ -282,6 +279,11 @@ Nolan Nichols            </a>
                         </a>
                     </li>
                     <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/decentralize.html">
+                            <i class="fa fa-folder-open fa-lg"></i> decentralize
+                        </a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="http://nolan-nichols.com/category/semantic-web.html">
                             <i class="fa fa-folder-open fa-lg"></i> Semantic Web
                         </a>
@@ -289,10 +291,8 @@ Nolan Nichols            </a>
                 </ul>
             </li>
 
-            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
-                <ul class="list-group list-inline tagcloud" id="tags">
-                </ul>
-            </li>
+
+
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">
@@ -320,7 +320,7 @@ Nolan Nichols            </a>
       <hr>
       <div class="row">
          <div class="col-xs-10">&copy; 2016 Nolan Nichols
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     Content

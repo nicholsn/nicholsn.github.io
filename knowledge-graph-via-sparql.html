@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:og="http://ogp.me/ns#"
-      xmlns:fb="https://www.facebook.com/2008/fbml">
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
 <head>
     <title>RDFizing Results from the Google Knowledge Graph API - Nolan Nichols</title>
     <!-- Using the latest rendering mode for IE -->
@@ -199,6 +197,11 @@ init_mathjax();
         <link href="http://nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
               title="Nolan Nichols ATOM Feed"/>
 
+
+
+        <link href="http://nolan-nichols.com/feeds/semantic-web.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Nolan Nichols Semantic Web ATOM Feed"/>
+
 </head>
 <body>
 
@@ -228,11 +231,10 @@ Nolan Nichols            </a>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <li><span>
-                <form class="navbar-search" action="/search">
+                <form class="navbar-search" action="/search.html">
                   <input type="text" class="search-query" placeholder="Search" name="q" id="tipue_search_input" required>
                 </form></span>
               </li>
-              <li><a href="http://nolan-nichols.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -243,7 +245,6 @@ Nolan Nichols            </a>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-9">
-
     <section id="content">
         <article>
             <header class="page-header">
@@ -263,6 +264,8 @@ Nolan Nichols            </a>
     <span class="published">
         <i class="fa fa-calendar"></i><time datetime="2016-01-12T00:00:00-08:00"> Tue 12 January 2016</time>
     </span>
+
+
             <span class="label label-default">By</span>
             <a href="http://nolan-nichols.com/author/nolan-nichols.html"><i class="fa fa-user"></i> Nolan Nichols</a>
 
@@ -318,7 +321,7 @@ Nolan Nichols            </a>
 <div class="prompt input_prompt">In&nbsp;[92]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">os</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
 <span class="kn">import</span> <span class="nn">pyld</span>
@@ -347,9 +350,9 @@ Nolan Nichols            </a>
 <div class="prompt input_prompt">In&nbsp;[94]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">kg_key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s">&#39;~&#39;</span><span class="p">),</span> <span class="s">&#39;.knowledge-graph-key&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;https://kgsearch.googleapis.com/v1/entities:search&quot;</span><span class="p">,</span> 
-                 <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s">&quot;Archer&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">kg_key</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s">&quot;TVSeries&quot;</span><span class="p">))</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">kg_key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.knowledge-graph-key&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://kgsearch.googleapis.com/v1/entities:search&quot;</span><span class="p">,</span> 
+                 <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;Archer&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">kg_key</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;TVSeries&quot;</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -373,7 +376,7 @@ Nolan Nichols            </a>
 <div class="prompt input_prompt">In&nbsp;[100]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">jsonld</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">jsonld</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 
@@ -388,39 +391,39 @@ Nolan Nichols            </a>
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>{
-  &quot;@context&quot;: {
-    &quot;@vocab&quot;: &quot;http://schema.org/&quot;,
-    &quot;goog&quot;: &quot;http://schema.googleapis.com/&quot;,
-    &quot;EntitySearchResult&quot;: &quot;goog:EntitySearchResult&quot;,
-    &quot;detailedDescription&quot;: &quot;goog:detailedDescription&quot;,
-    &quot;resultScore&quot;: &quot;goog:resultScore&quot;,
-    &quot;kg&quot;: &quot;http://g.co/kg&quot;
+  &#34;@context&#34;: {
+    &#34;@vocab&#34;: &#34;http://schema.org/&#34;,
+    &#34;goog&#34;: &#34;http://schema.googleapis.com/&#34;,
+    &#34;EntitySearchResult&#34;: &#34;goog:EntitySearchResult&#34;,
+    &#34;detailedDescription&#34;: &#34;goog:detailedDescription&#34;,
+    &#34;resultScore&#34;: &#34;goog:resultScore&#34;,
+    &#34;kg&#34;: &#34;http://g.co/kg&#34;
   },
-  &quot;@type&quot;: &quot;ItemList&quot;,
-  &quot;itemListElement&quot;: [
+  &#34;@type&#34;: &#34;ItemList&#34;,
+  &#34;itemListElement&#34;: [
     {
-      &quot;@type&quot;: &quot;EntitySearchResult&quot;,
-      &quot;result&quot;: {
-        &quot;@id&quot;: &quot;kg:/m/06_wvhl&quot;,
-        &quot;name&quot;: &quot;Archer&quot;,
-        &quot;@type&quot;: [
-          &quot;TVSeries&quot;,
-          &quot;Thing&quot;
+      &#34;@type&#34;: &#34;EntitySearchResult&#34;,
+      &#34;result&#34;: {
+        &#34;@id&#34;: &#34;kg:/m/06_wvhl&#34;,
+        &#34;name&#34;: &#34;Archer&#34;,
+        &#34;@type&#34;: [
+          &#34;TVSeries&#34;,
+          &#34;Thing&#34;
         ],
-        &quot;description&quot;: &quot;American animated series&quot;,
-        &quot;image&quot;: {
-          &quot;contentUrl&quot;: &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot;,
-          &quot;url&quot;: &quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot;,
-          &quot;license&quot;: &quot;http://creativecommons.org/licenses/by/2.0&quot;
+        &#34;description&#34;: &#34;American animated series&#34;,
+        &#34;image&#34;: {
+          &#34;contentUrl&#34;: &#34;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&#34;,
+          &#34;url&#34;: &#34;https://en.wikipedia.org/wiki/Archer_(TV_series)&#34;,
+          &#34;license&#34;: &#34;http://creativecommons.org/licenses/by/2.0&#34;
         },
-        &quot;detailedDescription&quot;: {
-          &quot;articleBody&quot;: &quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot;,
-          &quot;url&quot;: &quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot;,
-          &quot;license&quot;: &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;
+        &#34;detailedDescription&#34;: {
+          &#34;articleBody&#34;: &#34;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &#34;,
+          &#34;url&#34;: &#34;http://en.wikipedia.org/wiki/Archer_(TV_series)&#34;,
+          &#34;license&#34;: &#34;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&#34;
         },
-        &quot;url&quot;: &quot;http://www.fxnetworks.com/archer&quot;
+        &#34;url&#34;: &#34;http://www.fxnetworks.com/archer&#34;
       },
-      &quot;resultScore&quot;: 43.221546
+      &#34;resultScore&#34;: 43.221546
     },
 ...
 </pre>
@@ -448,7 +451,7 @@ Nolan Nichols            </a>
 <div class="prompt input_prompt">In&nbsp;[101]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">normalized</span> <span class="o">=</span> <span class="n">pyld</span><span class="o">.</span><span class="n">jsonld</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">jsonld</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s">&#39;URDNA2015&#39;</span><span class="p">,</span> <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;application/nquads&#39;</span><span class="p">})</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">normalized</span> <span class="o">=</span> <span class="n">pyld</span><span class="o">.</span><span class="n">jsonld</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">jsonld</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s1">&#39;URDNA2015&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;application/nquads&#39;</span><span class="p">})</span>
 <span class="k">print</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
 </pre></div>
 
@@ -463,12 +466,12 @@ Nolan Nichols            </a>
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n4 .
-&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://schema.org/name&gt; &quot;Cassius &amp;amp; Clay&quot; .
+&lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://schema.org/name&gt; &#34;Cassius &amp;amp; Clay&#34; .
 &lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
 &lt;http://g.co/kg/g/11cknytgw6&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
 &lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n35 .
-&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.org/description&gt; &quot;British television show&quot; .
-&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.org/name&gt; &quot;The Dame Edna Experience&quot; .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.org/description&gt; &#34;British television show&#34; .
+&lt;http://g.co/kg/m/0264z1w&gt; &lt;http://schema.org/name&gt; &#34;The Dame Edna Experience&#34; .
 &lt;http://g.co/kg/m/0264z1w&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .
 &lt;http://g.co/kg/m/0264z1w&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .
 &lt;http://g.co/kg/m/02qcfrx&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n20 .
@@ -496,9 +499,9 @@ Nolan Nichols            </a>
 <div class="prompt input_prompt">In&nbsp;[103]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-<span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;n3&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;turtle&#39;</span><span class="p">))</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;n3&#39;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -520,15 +523,15 @@ Nolan Nichols            </a>
 
 &lt;http://g.co/kg/m/06_wvhl&gt; a ns1:TVSeries,
         ns1:Thing ;
-    ns2:detailedDescription [ ns1:articleBody &quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot; ;
-            ns1:license &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; ;
-            ns1:url &quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot; ] ;
-    ns1:description &quot;American animated series&quot; ;
-    ns1:image [ ns1:contentUrl &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot; ;
-            ns1:license &quot;http://creativecommons.org/licenses/by/2.0&quot; ;
-            ns1:url &quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot; ] ;
-    ns1:name &quot;Archer&quot; ;
-    ns1:url &quot;http://www.fxnetworks.com/archer&quot; .
+    ns2:detailedDescription [ ns1:articleBody &#34;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &#34; ;
+            ns1:license &#34;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&#34; ;
+            ns1:url &#34;http://en.wikipedia.org/wiki/Archer_(TV_series)&#34; ] ;
+    ns1:description &#34;American animated series&#34; ;
+    ns1:image [ ns1:contentUrl &#34;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&#34; ;
+            ns1:license &#34;http://creativecommons.org/licenses/by/2.0&#34; ;
+            ns1:url &#34;https://en.wikipedia.org/wiki/Archer_(TV_series)&#34; ] ;
+    ns1:name &#34;Archer&#34; ;
+    ns1:url &#34;http://www.fxnetworks.com/archer&#34; .
 
 [] a ns1:ItemList ;
     ns1:itemListElement [ a ns2:EntitySearchResult ;
@@ -563,19 +566,19 @@ Nolan Nichols            </a>
 <div class="prompt input_prompt">In&nbsp;[117]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">q</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;SELECT ?name ?description ?url ?score ?image</span>
-<span class="s">       WHERE {?b a ns2:EntitySearchResult ;</span>
-<span class="s">                 ns2:resultScore ?score ;</span>
-<span class="s">                 ns1:result ?result .</span>
-<span class="s">              ?result ns1:description ?description ;</span>
-<span class="s">                      ns1:name ?name ;</span>
-<span class="s">                      ns1:url  ?url ;</span>
-<span class="s">                      ns1:image ?b_image .</span>
-<span class="s">              ?b_image ns1:contentUrl ?image .}</span>
-<span class="s">       ORDER BY DESC(?score)</span>
-<span class="s">       LIMIT 1</span>
-<span class="s">&quot;&quot;&quot;</span>
-<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;csv&#39;</span><span class="p">))</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT ?name ?description ?url ?score ?image</span>
+<span class="s2">       WHERE {?b a ns2:EntitySearchResult ;</span>
+<span class="s2">                 ns2:resultScore ?score ;</span>
+<span class="s2">                 ns1:result ?result .</span>
+<span class="s2">              ?result ns1:description ?description ;</span>
+<span class="s2">                      ns1:name ?name ;</span>
+<span class="s2">                      ns1:url  ?url ;</span>
+<span class="s2">                      ns1:image ?b_image .</span>
+<span class="s2">              ?b_image ns1:contentUrl ?image .}</span>
+<span class="s2">       ORDER BY DESC(?score)</span>
+<span class="s2">       LIMIT 1</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="k">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -615,7 +618,7 @@ Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http:
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre> 
+<div class=" highlight hl-ipython2"><pre><span></span> 
 </pre></div>
 
 </div>
@@ -694,6 +697,11 @@ Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http:
                         </a>
                     </li>
                     <li class="list-group-item">
+                        <a href="http://nolan-nichols.com/category/decentralize.html">
+                            <i class="fa fa-folder-open fa-lg"></i> decentralize
+                        </a>
+                    </li>
+                    <li class="list-group-item">
                         <a href="http://nolan-nichols.com/category/semantic-web.html">
                             <i class="fa fa-folder-open fa-lg"></i> Semantic Web
                         </a>
@@ -701,10 +709,8 @@ Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http:
                 </ul>
             </li>
 
-            <li class="list-group-item"><a href="http://nolan-nichols.com/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
-                <ul class="list-group list-inline tagcloud" id="tags">
-                </ul>
-            </li>
+
+
 
     <li class="list-group-item"><h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
         <div id="gh_repos">
@@ -732,7 +738,7 @@ Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http:
       <hr>
       <div class="row">
          <div class="col-xs-10">&copy; 2016 Nolan Nichols
-            &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>              <p><small>  <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="//i.creativecommons.org/l/by/4.0/80x15.png" /></a>
     Content
