@@ -1,1 +1,1 @@
-Sitemap: http://www.nolan-nichols.com/sitemap.xml
+Sitemap: http://www.nolan-nichols.com/sitemap.txt
