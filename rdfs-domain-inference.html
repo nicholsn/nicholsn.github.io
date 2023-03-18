@@ -13,12 +13,12 @@
 
 <meta property="og:title" content="Exploring RDFS Inference with Domain and Range "/>
 <meta property="og:url" content="https://www.nolan-nichols.com/rdfs-domain-inference.html" />
-<meta property="og:description" content="A quick overview of RDFS reasoning when specifying the domain for a given property." />
+<meta property="og:description" content="A quick overview of RDFS reasoning when specifying the domain for a given" />
 <meta property="og:site_name" content="Nolan Nichols" />
 <meta property="og:article:author" content="Nolan Nichols" />
 <meta property="og:article:published_time" content="2015-09-28T00:00:00-07:00" />
 <meta name="twitter:title" content="Exploring RDFS Inference with Domain and Range ">
-<meta name="twitter:description" content="A quick overview of RDFS reasoning when specifying the domain for a given property.">
+<meta name="twitter:description" content="A quick overview of RDFS reasoning when specifying the domain for a given">
 
         <title>Exploring RDFS Inference with Domain and Range  · Nolan Nichols
 </title>
@@ -27,6 +27,14 @@
         <link rel="stylesheet" type="text/css" href="https://www.nolan-nichols.com/theme/css/custom.css" media="screen">
 
         <link href="https://www.nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nolan Nichols - Full Atom Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49888620-1', 'auto');
+    ga('send', 'pageview');
+</script>
 
 
     </head>
@@ -78,7 +86,384 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <p>{% notebook reasoning-with-rdfs-and-owl.ipynb %}</p>
+            <p>property.</p>
+<h2>Overview</h2>
+<p>Inference using RDFS and OWL can be a confusing topic as it is not intuitive how topics
+like Domain and Range work when living with
+an <a href="https://en.wikipedia.org/wiki/Open-world_assumption">Open World Assumption</a>. It is
+common for folks to interpret, for example, the Domain of an Object or Data Propery in
+RDFS as a restriction on allowable values, when that is not what actually takes place
+during inference.</p>
+<p>In this post, I'll use the <a href="https://github.com/RDFLib/OWL-RL">OWL-RL</a> library to show
+how inference works when specifying the Domain of an Object property to help others
+avoid some of the modeling errors I'm made and to better understand how inference can be
+benneficial.</p>
+<p>First, we'll need an environment to work in, so if you want to execute this notebook
+yourself, you'll need to install the following.</p>
+<h3>Dependencies</h3>
+<p>To get started you will need the following libraries. Here I am configuring using conda
+to create a custom environment:</p>
+<div class="highlight"><pre><span></span><code>conda create -n inference pip pyparsing html5lib notebook
+source activate inference
+pip install https://github.com/RDFLib/rdflib/archive/master.zip
+pip install https://github.com/RDFLib/OWL-RL/archive/master.zip
+</code></pre></div>
+
+<h2>Import RDF Libraries</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">rdflib</span>
+<span class="kn">import</span> <span class="nn">RDFClosure</span>
+</code></pre></div>
+
+<h2>Create and Populate a Graph</h2>
+<ul>
+<li>First we create a graph to work with as an example</li>
+<li>Then we add a single triple to the graph that only includes a label</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">ttl</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;@prefix : &lt;#&gt; .</span>
+<span class="s2">         @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
+<span class="s2">         @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .</span>
+<span class="s2">         @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .</span>
+<span class="s2">         @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .</span>
+
+<span class="s2">         :non-typed-indv rdfs:label &quot;Example Subject with no rdf:type information.&quot; .</span>
+<span class="s2">      &quot;&quot;&quot;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ttl</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &#39;rdflib.graph.Graph&#39;&gt;)&gt;
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nb">print</span>
+<span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">@prefix</span><span class="w"> </span><span class="nn">:</span><span class="w"> </span><span class="nv">&lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdf:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xml:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/XML/1998/namespace&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xsd:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">non-typed-indv</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Example Subject with no rdf:type information.&quot;</span> <span class="p">.</span>
+</code></pre></div>
+
+<h2>Define an  OWL Classe and Datatype Property</h2>
+<ul>
+<li>Here we pull some example classes from an OWL file in
+  the <a href="http://nidm.nidash.org">Neuroimaging Data Model (NIDM)</a></li>
+<li>The first is an <code>owl:Class</code> representing a Mask Map</li>
+<li>Next is an <code>owl:DatatypeProperty</code> with the class above listed as its <code>rdfs:domain</code></li>
+<li>We then add these semantics to the same graph as our simple example above</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">owl</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
+<span class="s2">    @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .</span>
+<span class="s2">    @prefix xml: &lt;http://www.w3.org/XML/1998/namespace&gt; .</span>
+<span class="s2">    @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .</span>
+<span class="s2">    @prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .</span>
+<span class="s2">    @prefix obo: &lt;http://purl.obolibrary.org/obo/&gt; .</span>
+<span class="s2">    @prefix nidm: &lt;http://purl.org/nidash/nidm#&gt; .</span>
+
+<span class="s2">    nidm:NIDM_0000054 rdf:type owl:Class ;</span>
+<span class="s2">                      rdfs:label &quot;Mask Map&quot; ;</span>
+<span class="s2">                      obo:IAO_0000115 &quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot; .</span>
+
+<span class="s2">    nidm:NIDM_0000158 rdf:type owl:DatatypeProperty ;</span>
+<span class="s2">                  rdfs:label &quot;noise FWHM In Vertices&quot; ;                  </span>
+<span class="s2">                  rdfs:comment &quot;Range: Vector of positive floats.&quot; ;</span>
+<span class="s2">                  obo:IAO_0000115 &quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot; ;                  </span>
+<span class="s2">                  rdfs:domain nidm:NIDM_0000054 .</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">owl</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &#39;rdflib.graph.Graph&#39;&gt;)&gt;
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nb">print</span>
+<span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">@prefix</span><span class="w"> </span><span class="nn">:</span><span class="w"> </span><span class="nv">&lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">nidm:</span><span class="w"> </span><span class="nv">&lt;http://purl.org/nidash/nidm#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">obo:</span><span class="w"> </span><span class="nv">&lt;http://purl.obolibrary.org/obo/&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">owl:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2002/07/owl#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdf:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xml:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/XML/1998/namespace&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xsd:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">non-typed-indv</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Example Subject with no rdf:type information.&quot;</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="kt">a</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;noise FWHM In Vertices&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="s">&quot;Range: Vector of positive floats.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="kt">a</span> <span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Mask Map&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot;</span> <span class="p">.</span>
+</code></pre></div>
+
+<h2>Applying RDFS Reasoning</h2>
+<ul>
+<li>First we will just apply reasoning to the graph as-is and see the result</li>
+<li>Then we will add our datatype property to the individual to see what the result is
+  after reasoning</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">rdfs</span> <span class="o">=</span> <span class="n">RDFClosure</span><span class="o">.</span><span class="n">DeductiveClosure</span><span class="p">(</span><span class="n">RDFClosure</span><span class="o">.</span><span class="n">RDFS_Semantics</span><span class="p">)</span>
+<span class="n">rdfs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nb">print</span>
+<span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">@prefix</span><span class="w"> </span><span class="nn">:</span><span class="w"> </span><span class="nv">&lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">nidm:</span><span class="w"> </span><span class="nv">&lt;http://purl.org/nidash/nidm#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">obo:</span><span class="w"> </span><span class="nv">&lt;http://purl.obolibrary.org/obo/&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">owl:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2002/07/owl#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdf:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xml:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/XML/1998/namespace&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xsd:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">non-typed-indv</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Example Subject with no rdf:type information.&quot;</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span><span class="p">,</span>
+        <span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;noise FWHM In Vertices&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="s">&quot;Range: Vector of positive floats.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">Literal</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span><span class="p">,</span>
+        <span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Mask Map&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot;</span> <span class="p">.</span>
+
+<span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="p">.</span>
+
+<span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+</code></pre></div>
+
+<h3>Notes on the explanded graph</h3>
+<ul>
+<li>Here you now see that some basic triples have bee added to the graph that were not
+  previously available.</li>
+<li>There isn't much interesting added, although you'll see that
+  our <code>:non-typed-indv a rdfs:Resource</code></li>
+</ul>
+<h2>Adding a Datatype Property</h2>
+<ul>
+<li>We now use one of the NIDM datatype properties on our example triple and give it a
+  value</li>
+<li>Note that when the statement is parsed it is simply appended below
+  our <code>:non-typed-indv</code></li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">datatype</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">           @prefix : &lt;#&gt; .</span>
+<span class="s2">           @prefix nidm: &lt;http://purl.org/nidash/nidm#&gt; .</span>
+
+<span class="s2">           :non-typed-indv nidm:NIDM_0000158 &quot;[2.95, 2.96, 2.61]&quot; .</span>
+<span class="s2">&quot;&quot;&quot;</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">datatype</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>&lt;Graph identifier=N3b10fe26085349e6bec65a1a5d333a92 (&lt;class &#39;rdflib.graph.Graph&#39;&gt;)&gt;
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="nb">print</span>
+<span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">@prefix</span><span class="w"> </span><span class="nn">:</span><span class="w"> </span><span class="nv">&lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">nidm:</span><span class="w"> </span><span class="nv">&lt;http://purl.org/nidash/nidm#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">obo:</span><span class="w"> </span><span class="nv">&lt;http://purl.obolibrary.org/obo/&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">owl:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2002/07/owl#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdf:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xml:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/XML/1998/namespace&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xsd:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">non-typed-indv</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Example Subject with no rdf:type information.&quot;</span> <span class="p">;</span>
+    <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="s">&quot;[2.95, 2.96, 2.61]&quot;</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span><span class="p">,</span>
+        <span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;noise FWHM In Vertices&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="s">&quot;Range: Vector of positive floats.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">Literal</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span><span class="p">,</span>
+        <span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Mask Map&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot;</span> <span class="p">.</span>
+
+<span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="p">.</span>
+
+<span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+</code></pre></div>
+
+<h3>Inferring additional type information using rdfs:domain semantics</h3>
+<ul>
+<li>Next we will expand the graph and see what happens</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">rdfs</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="nb">print</span>
+<span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="k">@prefix</span><span class="w"> </span><span class="nn">:</span><span class="w"> </span><span class="nv">&lt;file:///Users/nicholsn/Repos/nicholsn.github.io/content/notebooks/#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">nidm:</span><span class="w"> </span><span class="nv">&lt;http://purl.org/nidash/nidm#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">obo:</span><span class="w"> </span><span class="nv">&lt;http://purl.obolibrary.org/obo/&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">owl:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2002/07/owl#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdf:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">rdfs:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xml:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/XML/1998/namespace&gt;</span><span class="w"> </span><span class="p">.</span>
+<span class="k">@prefix</span><span class="w"> </span><span class="nn">xsd:</span><span class="w"> </span><span class="nv">&lt;http://www.w3.org/2001/XMLSchema#&gt;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">:</span><span class="nt">non-typed-indv</span> <span class="kt">a</span> <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Example Subject with no rdf:type information.&quot;</span> <span class="p">;</span>
+    <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="s">&quot;[2.95, 2.96, 2.61]&quot;</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">Literal</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span><span class="p">,</span>
+        <span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;noise FWHM In Vertices&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;Estimated Full Width at Half Maximum of the spatial smoothness of the noise process in vertices.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="s">&quot;Range: Vector of positive floats.&quot;</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000158</span> <span class="p">.</span>
+
+<span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">comment</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">domain</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="kt">a</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span><span class="p">,</span>
+        <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subPropertyOf</span> <span class="p">.</span>
+
+<span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">owl</span><span class="p">:</span><span class="nt">DatatypeProperty</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">nidm</span><span class="p">:</span><span class="nt">NIDM_0000054</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span><span class="p">,</span>
+        <span class="nn">owl</span><span class="p">:</span><span class="nt">Class</span> <span class="p">;</span>
+    <span class="nn">rdfs</span><span class="p">:</span><span class="nt">label</span> <span class="s">&quot;Mask Map&quot;</span> <span class="p">;</span>
+    <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000115</span> <span class="s">&quot;A binary map representing the exact set of elements (e.g., pixels, voxels, vertices, and faces) in which an activity was performed (e.g. the mask map generated by the model parameter estimation activity represents the exact set of voxels in which the mass univariate model was estimated) and/or restraining the space in which an activity was performed (e.g. the mask map used by inference)&quot;</span> <span class="p">.</span>
+
+<span class="nn">rdf</span><span class="p">:</span><span class="nt">Property</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+
+<span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="kt">a</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">Resource</span> <span class="p">.</span>
+</code></pre></div>
+
+<h3>Interpreting the results</h3>
+<ul>
+<li>As you'll notice, we now have an additional <code>rdf:type</code> associated with
+  our <code>:non-typed-indv</code> indicating that it is a <code>nidm:NIDM_0000054</code></li>
+<li>This new type indicates that our object is a "Mask Map", but is that what we wanted?
+  Possibly, but let's think about this a bit more...</li>
+</ul>
+<p>When we are modeling a given domain in OWL it is important to know what inferences will
+come out of your design decisions. Here, the use of <code>rdfs:domain</code> on
+an <code>owl:DatatypePropery</code> caused us to infer specific type information simply by using
+the property.</p>
+<p>In this case the property is for "noise FWHM In Verticies", which is pretty specific
+with the definition of:</p>
+<blockquote>
+<p>"Estimated Full Width at Half Maximum of the spatial smoothness of the noise process
+in vertices."</p>
+</blockquote>
+<p>Any resource using this property, where the author read the definition, is probably in
+good shape to infer that this is likely a "Mask Map"; however, it is important to ask
+the question:</p>
+<blockquote>
+<p>"Is there ever a situation where this property could be reasonably applied to an
+object that is not a Mask Map?"</p>
+</blockquote>
+<p>Possibly not, but inferring new types is not what I originally though of intuitively in
+the context of data modeling. My original expectation, from a modeling perspective using
+XSD or relational databases, is that <code>rdfs:domain</code> would place a restriction that could
+be used to validate if this object indeed conforms to its type definition. This is
+clearly not the case with RDFS reasoning.</p>
+<p>For validation with RDF models there is, surprisingly, no straightforward solution.
+Although there are a number of efforts in this space
+with <a href="http://spinrdf.org">SPIN Rules</a>
+and <a href="http://www.w3.org/2001/sw/wiki/ShEx">ShEx RDF Shape Expressions</a>.</p>
+<p>Another avenue to explore in a future post is the use
+of <a href="http://www.w3.org/TR/owl2-primer/#Property_Restrictions">OWL Property Restrictions</a></p>
 
 
              

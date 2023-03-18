@@ -13,12 +13,12 @@
 
 <meta property="og:title" content="NIDM and NCANDA at Neuroinformatics 2015 "/>
 <meta property="og:url" content="https://www.nolan-nichols.com/ni2015.html" />
-<meta property="og:description" content="A brief summary of my role at Neuroinformatics 2015 including the pre-meeting NIDM Workshop and a talk I presents during the investigator session." />
+<meta property="og:description" content="A brief summary of my role at Neuroinformatics 2015 including the pre-meeting" />
 <meta property="og:site_name" content="Nolan Nichols" />
 <meta property="og:article:author" content="Nolan Nichols" />
 <meta property="og:article:published_time" content="2015-09-21T00:00:00-07:00" />
 <meta name="twitter:title" content="NIDM and NCANDA at Neuroinformatics 2015 ">
-<meta name="twitter:description" content="A brief summary of my role at Neuroinformatics 2015 including the pre-meeting NIDM Workshop and a talk I presents during the investigator session.">
+<meta name="twitter:description" content="A brief summary of my role at Neuroinformatics 2015 including the pre-meeting">
 
         <title>NIDM and NCANDA at Neuroinformatics 2015  · Nolan Nichols
 </title>
@@ -27,6 +27,14 @@
         <link rel="stylesheet" type="text/css" href="https://www.nolan-nichols.com/theme/css/custom.css" media="screen">
 
         <link href="https://www.nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nolan Nichols - Full Atom Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49888620-1', 'auto');
+    ga('send', 'pageview');
+</script>
 
 
     </head>
@@ -78,12 +86,46 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <h2>Overview</h2>
-<p>This year the annual <a href="http://www.neuroinformatics2015.org">Neuroinformatics Congress</a> took place in tropical <a href="https://en.wikipedia.org/wiki/Cairns">Cairns, Austrailia</a>, where I had the opportunity to lead a pre-meeting workshop on the Neuroimaging Data Model (<a href="http://nidm.nidash.org">NIDM</a>) and present the data integration framework developed for the National Consortium on Alcohol NeuroDevelopment in Adolescence (<a href="http://ncanda.org">NCANDA</a>). Below you can find highlights and links to a few resources I've made available. </p>
+            <p>NIDM Workshop and a talk I presents during the investigator session.</p>
+<h2>Overview</h2>
+<p>This year the annual <a href="http://www.neuroinformatics2015.org">Neuroinformatics Congress</a> took place in
+tropical <a href="https://en.wikipedia.org/wiki/Cairns">Cairns, Austrailia</a>, where I had the opportunity to lead a pre-meeting
+workshop on the Neuroimaging Data Model (<a href="http://nidm.nidash.org">NIDM</a>) and present the data integration
+framework developed for the National Consortium on Alcohol NeuroDevelopment in
+Adolescence (<a href="http://ncanda.org">NCANDA</a>). Below you can find highlights and links to a few resources
+I've made available.</p>
 <h2>NIDM Workshop</h2>
-<p>The NIDM Workshop took place over two days where I was able to sit down with around 10 participants and my fellow NIDM Developers from the International Neuroinformatics Coordinating Facility (<a href="http://incf.org/">INCF</a>) Neuroimaging Data Sharing (<a href="http://wiki.incf.org/mediawiki/index.php/Neuroimaging_Task_Force">NIDASH</a>) Task Force. We put together a number of training materials before workshop in the form of <a href="https://jupyter.org/">Jupyter Notebooks</a> that are available on our <a href="https://github.com/incf-nidash/nidm-training">nidm-trianing</a> Github repo. The training materials provide an introduction to NIDM and our use of the <a href="http://www.w3.org/TR/prov-overview/">W3C PROV</a> standards to represent provenance and metadata from neuroimaging studies. I'll detail NIDM in another blog post, but briefly we use <a href="https://en.wikipedia.org/wiki/Semantic_Web">Semantic Web Standards</a> to formalize terms and vocabulary used to share brain imaging data. Additionally, Semantic Web tools provide a useful framework for data integration. For example, I created a <a href="https://github.com/incf-nidash/nidm-training/blob/master/use-cases/integration-queries/ABIDE_FBIRN_Query.ipynb">simple example of integrating two datasets</a> that use that use different labels for the same information. Finally, I worked on a converter to generate a NIDM document from a medical imaging database that is (currently) open as a <a href="https://github.com/incf-nidash/nidm/pull/340">pull request</a> on the NIDM Github repo. This was the first time our group presented to this material in an educational setting, which was great fun and incredibly helpful to hear additional use cases and example applications!  </p>
+<p>The NIDM Workshop took place over two days where I was able to sit down with around 10
+participants and my fellow NIDM Developers from the International Neuroinformatics
+Coordinating Facility (<a href="http://incf.org/">INCF</a>) Neuroimaging Data Sharing (<a href="http://wiki.incf.org/mediawiki/index.php/Neuroimaging_Task_Force">NIDASH</a>) Task Force. We
+put together a number of training materials before workshop in the form
+of <a href="https://jupyter.org/">Jupyter Notebooks</a> that are available on our <a href="https://github.com/incf-nidash/nidm-training">nidm-trianing</a> Github repo. The
+training materials provide an introduction to NIDM and our use of the <a href="http://www.w3.org/TR/prov-overview/">W3C PROV</a>
+standards to represent provenance and metadata from neuroimaging studies. I'll detail
+NIDM in another blog post, but briefly we use <a href="https://en.wikipedia.org/wiki/Semantic_Web">Semantic Web Standards</a> to formalize
+terms and vocabulary used to share brain imaging data. Additionally, Semantic Web tools
+provide a useful framework for data integration. For example, I created
+a <a href="https://github.com/incf-nidash/nidm-training/blob/master/use-cases/integration-queries/ABIDE_FBIRN_Query.ipynb">simple example of integrating two datasets</a> that use that use different labels
+for the same information. Finally, I worked on a converter to generate a NIDM document
+from a medical imaging database that is (currently) open as a <a href="https://github.com/incf-nidash/nidm/pull/340">pull request</a> on the
+NIDM Github repo. This was the first time our group presented to this material in an
+educational setting, which was great fun and incredibly helpful to hear additional use
+cases and example applications!</p>
 <h2>NCANDA Presentation</h2>
-<p>During the Investigator Presentations session, there was strong representation from the NIDASH Task Force of which I was one. First, the overall <a href="http://www.frontiersin.org/Community/AbstractDetails.aspx?ABS_DOI=10.3389/conf.fnins.2015.91.00004&amp;eid=2602&amp;sname=Neuroinformatics_2015">NIDM framework was presented</a> by David Keator that details how to model neuroimaging study metadata, identify terms from ontologies, and contribute feedback and suggestions back to the task force. Similarly, Chris Gorgolewski presented on a standard for organizing brain imaging data into a directory structure that tools can operate off of in a common way, which is called the <a href="http://www.frontiersin.org/Community/AbstractDetails.aspx?ABS_DOI=10.3389/conf.fnins.2015.91.00056&amp;eid=2602&amp;sname=Neuroinformatics_2015">Brain Imaging Data Structure</a>. In my <a href="http://www.frontiersin.org/Community/AbstractDetails.aspx?ABS_DOI=10.3389/conf.fnins.2015.91.00042&amp;eid=2602&amp;sname=Neuroinformatics_2015">own presentation</a>, I discussed a framework we've been working on to harmonize <a href="http://xnat.org">XNAT</a> and <a href="http://project-redcap.org/">REDCap</a> using a collection of Python scripts that perform a variety of data transformations into a common data model based on REDCap. Additionally, the system automates image processing and scoring of clinical/neuropsychological measures. Currently, I'm working to now incorporate NIDM and BIDS into the NCANDA framework to demonstrate how these standards can be used in the wild. You can check out my presentation below and let me know what you think!</p>
+<p>During the Investigator Presentations session, there was strong representation from the
+NIDASH Task Force of which I was one. First, the
+overall <a href="http://www.frontiersin.org/Community/AbstractDetails.aspx?ABS_DOI=10.3389/conf.fnins.2015.91.00004&amp;eid=2602&amp;sname=Neuroinformatics_2015">NIDM framework was presented</a> by David Keator that details how to model
+neuroimaging study metadata, identify terms from ontologies, and contribute feedback and
+suggestions back to the task force. Similarly, Chris Gorgolewski presented on a standard
+for organizing brain imaging data into a directory structure that tools can operate off
+of in a common way, which is called the <a href="http://www.frontiersin.org/Community/AbstractDetails.aspx?ABS_DOI=10.3389/conf.fnins.2015.91.00056&amp;eid=2602&amp;sname=Neuroinformatics_2015">Brain Imaging Data Structure</a>. In
+my <a href="http://www.frontiersin.org/Community/AbstractDetails.aspx?ABS_DOI=10.3389/conf.fnins.2015.91.00042&amp;eid=2602&amp;sname=Neuroinformatics_2015">own presentation</a>, I discussed a framework we've been working on to
+harmonize <a href="http://xnat.org">XNAT</a> and <a href="http://project-redcap.org/">REDCap</a> using a collection of Python scripts that perform
+a variety of data transformations into a common data model based on REDCap.
+Additionally, the system automates image processing and scoring of
+clinical/neuropsychological measures. Currently, I'm working to now incorporate NIDM and
+BIDS into the NCANDA framework to demonstrate how these standards can be used in the
+wild. You can check out my presentation below and let me know what you think!</p>
 <p>{% youtube RduYPL82K64 %}</p>
 
 

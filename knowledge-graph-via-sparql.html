@@ -27,6 +27,14 @@
         <link rel="stylesheet" type="text/css" href="https://www.nolan-nichols.com/theme/css/custom.css" media="screen">
 
         <link href="https://www.nolan-nichols.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nolan Nichols - Full Atom Feed" />
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49888620-1', 'auto');
+    ga('send', 'pageview');
+</script>
 
 
     </head>
@@ -78,7 +86,1043 @@
 <div class="row-fluid">
         <div class="span8 offset2 article-content">
             
-            <p>{% notebook knowlege-graph-via-sparql.ipynb %}</p>
+            <h2>Introduction</h2>
+<p>The Google Knowledge Graph Search API was recently made
+publicly <a href="https://developers.google.com/knowledge-graph/">available</a>. This API allows
+for the use of <a href="http://schema.org/">Schema.org</a> types to limit the scope of search
+results to entities that have been categorized as a given type.</p>
+<p>For example, a search may be limited to the schema.org type of "Person" or "TVSeries" to
+enhance the quality of search results. Interestingly, the format of the data that is
+returned is [JSON-LD/(http://json-ld.org/) that provides a mapping between the JSON keys
+and URI's that include a unique and dereferencible identifier for clarifying the meaning
+of a given key.</p>
+<p>Further, JSON-LD (the LD is for Linked Data) is interoperable with the Resource
+Description Framework (<a href="https://www.w3.org/RDF/">RDF</a>) that offers a graph-based
+representation of knowledge based on subject-predicate-object "triples." For an API
+called 'Knowledge Graph" it makes sense to use a format that is compatible with
+this <a href="https://www.w3.org/">W3C</a> standard that underlies the Web's knowledge
+representation formalism: the Web Ontology
+Language (<a href="https://www.w3.org/TR/owl-features/">OWL</a>)</p>
+<p>What this buys us is the ability to use other W3C standards for working with the results
+of the Knowledge Graph, such as the <a href="https://www.w3.org/TR/sparql11-query/">SPARQL</a>
+Protocol and RDF Query Language. In this post, I am going to demonstrate how we can use
+a couple Python libraries to:</p>
+<ul>
+<li>access the Knowledge Graph API</li>
+<li>convert the JSON-LD results into RDF as a <a href="https://www.w3.org/TR/turtle/">Turtle</a>
+  document</li>
+<li>query the RDF graph using SPARQL</li>
+</ul>
+<h2>Python Libraries</h2>
+<p>First we need a few libraries for handling requests to the Knowledge Graoh API (
+requests), converting the JSON-LD results into RDF (pyld), and parsing the RDF into a
+queryable graph (rdflib). You can fnd these libraries at the links below:</p>
+<ul>
+<li>PyLD: https://github.com/digitalbazaar/pyld</li>
+<li>RDFLib: https://github.com/RDFLib/rdflib</li>
+<li>Requests: https://github.com/kennethreitz/requests</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">pyld</span>
+<span class="kn">import</span> <span class="nn">rdflib</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+</code></pre></div>
+
+<h2>Accessing the Knowledge Graph API</h2>
+<p>Here we first need to obtain a key from
+the <a href="https://console.developers.google.com">Google Developers Console</a> and enable
+access. You won't see the Knowledge Graph API show up in the list of popular APIS, so
+you'll need to search for it in the API Manager. Once you enable the API and generate a
+key, you may need to add your IP address to the section on "Accept requests from these
+server IP addresses".</p>
+<p>Below, I've saved my key and read it in. For fun here, I am just searching the
+schema.org type of "TVSeries" for a cartoon series called "Archer" - of course you can
+search for something more serious, but one thing I found is that many of the schema.org
+types are not supported. For example, an error was raised when I searched for the
+schema.org type for "Drug", "Anatomical Structure", and "MedicalStudy".</p>
+<div class="highlight"><pre><span></span><code><span class="n">kg_key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.knowledge-graph-key&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://kgsearch.googleapis.com/v1/entities:search&quot;</span><span class="p">,</span>
+                 <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="s2">&quot;Archer&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">kg_key</span><span class="p">,</span> <span class="n">types</span><span class="o">=</span><span class="s2">&quot;TVSeries&quot;</span><span class="p">))</span>
+</code></pre></div>
+
+<h2>Parsing the and Examining the Results</h2>
+<p>This is pretty straight forward. We just parse the returned JSON-LD using the standard
+json library - note that JSON-LD can be treated as just plain old JSON.</p>
+<p>You can see in the results that the initial section includes an <code>@context</code> indicating
+the mapping between different vocabularies and a "key". There are a number of returned '
+hits' and that each hit has associated with it a score. Here, the top score of '
+43.221546' is the TV Show we are interested in - Archer.</p>
+<div class="highlight"><pre><span></span><code><span class="n">jsonld</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="err">{</span>
+<span class="w">  </span><span class="ss">&quot;@context&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">    </span><span class="ss">&quot;@vocab&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://schema.org/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;goog&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://schema.googleapis.com/&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;goog:EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;goog:detailedDescription&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;goog:resultScore&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;kg&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://g.co/kg&quot;</span>
+<span class="w">  </span><span class="err">}</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;ItemList&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="ss">&quot;itemListElement&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">    {</span>
+<span class="n">      &quot;@type&quot;: &quot;EntitySearchResult&quot;,</span>
+<span class="n">      &quot;result&quot;: {</span>
+<span class="n">        &quot;@id&quot;: &quot;kg:/m/06_wvhl&quot;,</span>
+<span class="n">        &quot;name&quot;: &quot;Archer&quot;,</span>
+<span class="n">        &quot;@type&quot;: [</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;American animated series&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;image&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;contentUrl&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://creativecommons.org/licenses/by/2.0&quot;</span>
+<span class="w">        </span><span class="err">}</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://www.fxnetworks.com/archer&quot;</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">43.221546</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/02qcfrx&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Spanish Archer&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;TV show&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Spanish Archer was a talent show hosted by Rhodri Williams and occasionally Ruth Madoc. It was produced by L!VE TV and filmed at the station&#39;s headquarters at Canary Wharf in London.\n&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Spanish_Archer&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">16.060818</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/07cggr0&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Archer (1975)&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;TV series&quot;</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">14.106644</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/06w21l8&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Meet Corliss Archer&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;American sitcom&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;image&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;contentUrl&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://t2.gstatic.com/images?q=tbn:ANd9GcRqPkGi1_Rselb-ijqy_-5of6WsEkhDmoU036ZsvXBS83XZsWGb&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot;</span>
+<span class="w">        </span><span class="err">}</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Meet Corliss Archer is an American sitcom that aired in syndication from April to December 1954. The series stars Ann Baker in the title role. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">12.145683</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0gfds00&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Jeffrey Archer: The Truth&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Movie&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;2002 film&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Jeffrey Archer: The Truth is a 2002 BBC satirical comedy drama on the life of Jeffrey Archer, with the title role played by Damian Lewis. Its duration was 90 minutes and its premiere occurred on 1 December 2002. It was written and directed by Guy Jenkin.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Jeffrey_Archer:_The_Truth&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">11.167856</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/g/11cknytgw6&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Cassius &amp;amp; Clay&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Cassius &amp;amp; Clay is an upcoming American animated television series created by Adam Reed to be aired in 2016 alongside Archer on FXX. The show follows two women, Cassius and Clay living as bandits in a futuristic, post-apocalyptic America. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Cassius_%26_Clay&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.67782</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0bcr8s&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Robin Hood&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;British television programme&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Robin Hood is a British television programme, produced by independent production company Tiger Aspect Productions for BBC One, with co-funding from the BBC America cable television channel in the United States. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Robin_Hood_(2006_TV_series)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://www.robin-hood.tv/&quot;</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.573618</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0cv8fbn&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Violet Tendencies&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;Movie&quot;,</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;2010 film&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Violet Tendencies is a 2010 romantic comedy film directed by Casper Andreas, written by Jesse Archer, and starring Mindy Cohn and Marcus Patrick. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Violet_Tendencies&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.50758</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0hzp2zq&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Animation Salvation&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Television Program&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Animation Salvation is an Australian television Sunday night-time animation block aired on Fox8 on Sunday 7:30 pm to 10:30 pm from 7 March 2010.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Animation_Salvation&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.371247</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0kfwmt7&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Pirate&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Movie&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;1978 film&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Pirate is a 1978 American TV movie directed by Ken Annakin. It is based on the novel with the same title written by Harold Robbins.\nIt was broadcast by ABC in two parts November 21–22, 1978.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/The_Pirate_(1978_film)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.225814</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0522jn&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Major Dad&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;American sitcom&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Major Dad is an American sitcom created by Richard C. Okie and John G. Stephens, developed by Earl Pomerantz, that originally ran from 1989 to 1993 on CBS, starring Gerald McRaney as Major John D. MacGillis and Shanna Reed as his wife Polly. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Major_Dad&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.142771</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0264z1w&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Dame Edna Experience&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;British television show&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Dame Edna Experience is a British television comedy talk-show hosted by Dame Edna Everage. It ran for twelve regular episodes on ITV, plus two Christmas specials.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/The_Dame_Edna_Experience&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.123545</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/02qcyy2&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Footy Classified&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Australian television program&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Footy Classified, is an Australian television program broadcast on the Nine Network which discusses pressing issues relating to AFL football. It debuted on Monday 2 April 2007. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Footy_Classified&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://wwos.ninemsn.com.au/afl/classified/&quot;</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.105602</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/04q8zth&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Californians&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Television Series&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;image&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;contentUrl&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://t3.gstatic.com/images?q=tbn:ANd9GcSQ0FvOFyPFq3qLlZsbr4UTcIef_WZFGTqQfVum3VzCxpykLMhK&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot;</span>
+<span class="w">        </span><span class="err">}</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Californians is a 54-episode half-hour Western television series, set in the San Francisco gold rush of the 1850s, which aired on NBC from September 24, 1957, to May 26, 1959. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">1.043589</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0y5gfz0&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Roald Dahl&#39;s Esio Trot&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;,</span>
+<span class="n">          &quot;Movie&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Television film&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Roald Dahl&#39;s Esio Trot is a British comedy television film that was first broadcast as part of BBC One&#39;s 2014 Christmas programming. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Roald_Dahl&#39;s_Esio_Trot&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">0.963223</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/07ch475&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Seventh Avenue&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Movie&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;American television miniseries&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Seventh Avenue is a six-part American television miniseries broadcast in 1977. It is based on the 1967 Norman Bogner novel of the same name. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Seventh_Avenue_(miniseries)&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">0.930134</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0k2dng7&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Help! My Supply Teacher&#39;s Magic&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;TV Show&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Help! My Supply Teacher&#39;s Magic is a CBBC show which shows magicians in schools, tricking children into thinking they are supply teachers. It is presented by Iain Stirling. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Help!_My_Supply_Teacher&#39;s_Magic&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">0.871172</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/0863kh&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Storefront Lawyers&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;American drama series&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Storefront Lawyers is an American legal drama that ran from September 1970 to April 1971 on CBS. The series stars Robert Foxworth, Sheila Larken, David Arkin, and A Martinez.&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Storefront_Lawyers&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">0.871042</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/02rp2_&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Big Read&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Television Programme&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;The Big Read was a survey on books carried out by the BBC in the United Kingdom in 2003, where over three quarters of a million votes were received from the British public to find the nation&#39;s best-loved novel of all time. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/The_Big_Read&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">0.817672</span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span>
+<span class="w">    </span><span class="err">{</span>
+<span class="w">      </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;EntitySearchResult&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;result&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">        </span><span class="ss">&quot;@id&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;kg:/m/076vrw4&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;name&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Standing on the Edge of the Noise&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;@type&quot;</span><span class="err">:</span><span class="w"> </span><span class="o">[</span>
+<span class="n">          &quot;Movie&quot;,</span>
+<span class="n">          &quot;TVSeries&quot;,</span>
+<span class="n">          &quot;Thing&quot;</span>
+<span class="n">        </span><span class="o">]</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;description&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;TV programme&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="ss">&quot;detailedDescription&quot;</span><span class="err">:</span><span class="w"> </span><span class="err">{</span>
+<span class="w">          </span><span class="ss">&quot;articleBody&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;Standing on the Edge of the Noise is a unique, intimate look at Oasis performing in their own space, instead of the huge stadium stages on which they are more often seen. The programme includes a mix of classics and new tracks from Dig Out Your Soul. &quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;url&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;http://en.wikipedia.org/wiki/Standing_on_the_Edge_of_the_Noise&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="ss">&quot;license&quot;</span><span class="err">:</span><span class="w"> </span><span class="ss">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span>
+<span class="w">        </span><span class="err">}</span>
+<span class="w">      </span><span class="err">}</span><span class="p">,</span>
+<span class="w">      </span><span class="ss">&quot;resultScore&quot;</span><span class="err">:</span><span class="w"> </span><span class="mf">0.806576</span>
+<span class="w">    </span><span class="err">}</span>
+<span class="w">  </span><span class="err">]</span>
+<span class="err">}</span>
+</code></pre></div>
+
+<h2>Conversion to RDF</h2>
+<p>Now, we can of course just parse the JSON object above using Python or test out our
+javascript skills, which is actually what makes JSON-LD nice - you can encode these
+Semantic Web ideas into an API without forcing developers to know anything about
+the <a href="http://bnode.org/blog/2009/07/08/the-semantic-web-not-a-piece-of-cake">Semantic Web Technology Stack</a>,
+shown below:</p>
+<p><img src="http://bnode.org/media/2009/07/08/semantic_web_technology_stack.png"> </p>
+<p>To convert to RDF, we use the PyLD library and convert to a format called nquads that
+can include an additional URI in each RDF triple that indicates the graph that the
+triples belong to. Here there is no such graph, so only ntriples or n3 is output.</p>
+<div class="highlight"><pre><span></span><code><span class="n">normalized</span> <span class="o">=</span> <span class="n">pyld</span><span class="o">.</span><span class="n">jsonld</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">jsonld</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;algorithm&#39;</span><span class="p">:</span> <span class="s1">&#39;URDNA2015&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;application/nquads&#39;</span><span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/g/11cknytgw6&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n4 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/g/11cknytgw6&gt; &lt;http://schema.org/name&gt; &quot;Cassius &amp;amp; Clay&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/g/11cknytgw6&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/g/11cknytgw6&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0264z1w&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n35 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0264z1w&gt; &lt;http://schema.org/description&gt; &quot;British television show&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0264z1w&gt; &lt;http://schema.org/name&gt; &quot;The Dame Edna Experience&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0264z1w&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0264z1w&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n20 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; &lt;http://schema.org/description&gt; &quot;TV show&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; &lt;http://schema.org/name&gt; &quot;Spanish Archer&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n21 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; &lt;http://schema.org/description&gt; &quot;Australian television program&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; &lt;http://schema.org/name&gt; &quot;Footy Classified&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; &lt;http://schema.org/url&gt; &quot;http://wwos.ninemsn.com.au/afl/classified/&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02rp2_&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n8 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02rp2_&gt; &lt;http://schema.org/description&gt; &quot;Television Programme&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02rp2_&gt; &lt;http://schema.org/name&gt; &quot;The Big Read&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02rp2_&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/02rp2_&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/04q8zth&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n25 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/04q8zth&gt; &lt;http://schema.org/description&gt; &quot;Television Series&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/04q8zth&gt; &lt;http://schema.org/image&gt; _:c14n1 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/04q8zth&gt; &lt;http://schema.org/name&gt; &quot;The Californians&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/04q8zth&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/04q8zth&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0522jn&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n29 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0522jn&gt; &lt;http://schema.org/description&gt; &quot;American sitcom&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0522jn&gt; &lt;http://schema.org/name&gt; &quot;Major Dad&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0522jn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0522jn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n31 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/description&gt; &quot;American animated series&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/image&gt; _:c14n18 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/name&gt; &quot;Archer&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://schema.org/url&gt; &quot;http://www.fxnetworks.com/archer&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06w21l8&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n24 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06w21l8&gt; &lt;http://schema.org/description&gt; &quot;American sitcom&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06w21l8&gt; &lt;http://schema.org/image&gt; _:c14n40 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06w21l8&gt; &lt;http://schema.org/name&gt; &quot;Meet Corliss Archer&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06w21l8&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/06w21l8&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/076vrw4&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n19 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/076vrw4&gt; &lt;http://schema.org/description&gt; &quot;TV programme&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/076vrw4&gt; &lt;http://schema.org/name&gt; &quot;Standing on the Edge of the Noise&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/076vrw4&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/076vrw4&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/076vrw4&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07cggr0&gt; &lt;http://schema.org/description&gt; &quot;TV series&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07cggr0&gt; &lt;http://schema.org/name&gt; &quot;Archer (1975)&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07cggr0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07cggr0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07ch475&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n26 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07ch475&gt; &lt;http://schema.org/description&gt; &quot;American television miniseries&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07ch475&gt; &lt;http://schema.org/name&gt; &quot;Seventh Avenue&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07ch475&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07ch475&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/07ch475&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0863kh&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n38 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0863kh&gt; &lt;http://schema.org/description&gt; &quot;American drama series&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0863kh&gt; &lt;http://schema.org/name&gt; &quot;Storefront Lawyers&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0863kh&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0863kh&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n42 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; &lt;http://schema.org/description&gt; &quot;British television programme&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; &lt;http://schema.org/name&gt; &quot;Robin Hood&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; &lt;http://schema.org/url&gt; &quot;http://www.robin-hood.tv/&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n22 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; &lt;http://schema.org/description&gt; &quot;2010 film&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; &lt;http://schema.org/name&gt; &quot;Violet Tendencies&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0gfds00&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n6 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0gfds00&gt; &lt;http://schema.org/description&gt; &quot;2002 film&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0gfds00&gt; &lt;http://schema.org/name&gt; &quot;Jeffrey Archer: The Truth&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0gfds00&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0gfds00&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0gfds00&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n5 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; &lt;http://schema.org/description&gt; &quot;Television Program&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; &lt;http://schema.org/name&gt; &quot;Animation Salvation&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n33 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; &lt;http://schema.org/description&gt; &quot;TV Show&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; &lt;http://schema.org/name&gt; &quot;Help! My Supply Teacher&#39;s Magic&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n17 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; &lt;http://schema.org/description&gt; &quot;1978 film&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; &lt;http://schema.org/name&gt; &quot;The Pirate&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; &lt;http://schema.googleapis.com/detailedDescription&gt; _:c14n12 .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; &lt;http://schema.org/description&gt; &quot;Television film&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; &lt;http://schema.org/name&gt; &quot;Roald Dahl&#39;s Esio Trot&quot; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Movie&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/TVSeries&gt; .</span>
+<span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/Thing&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n0</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.2145683E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n0</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/06w21l8&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n0</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n1</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/contentUrl&gt; &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcSQ0FvOFyPFq3qLlZsbr4UTcIef_WZFGTqQfVum3VzCxpykLMhK&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n1</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n10</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.142771E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n10</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0522jn&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n10</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n11</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;8.065760000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n11</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/076vrw4&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n11</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n12</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Roald Dahl&#39;s Esio Trot is a British comedy television film that was first broadcast as part of BBC One&#39;s 2014 Christmas programming. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n12</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n12</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Roald_Dahl&#39;s_Esio_Trot&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n13</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;8.176720000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n13</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/02rp2_&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n13</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n14</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.123545E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n14</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0264z1w&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n14</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n0 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n10 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n11 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n13 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n14 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n16 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n2 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n23 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n27 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n28 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n3 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n30 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n32 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n34 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n36 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n37 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n39 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n41 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n7 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/itemListElement&gt; _:c14n9 .</span>
+<span class="nl">_:</span><span class="n">c14n15</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.org/ItemList&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n16</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.573618E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n16</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0bcr8s&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n16</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n17</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;The Pirate is a 1978 American TV movie directed by Ken Annakin. It is based on the novel with the same title written by Harold Robbins.\nIt was broadcast by ABC in two parts November 21–22, 1978.&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n17</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n17</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Pirate_(1978_film)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n18</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/contentUrl&gt; &quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n18</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;http://creativecommons.org/licenses/by/2.0&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n18</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n19</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Standing on the Edge of the Noise is a unique, intimate look at Oasis performing in their own space, instead of the huge stadium stages on which they are more often seen. The programme includes a mix of classics and new tracks from Dig Out Your Soul. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n19</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n19</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Standing_on_the_Edge_of_the_Noise&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n2</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.371247E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n2</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0hzp2zq&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n2</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n20</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Spanish Archer was a talent show hosted by Rhodri Williams and occasionally Ruth Madoc. It was produced by L!VE TV and filmed at the station&#39;s headquarters at Canary Wharf in London.\n&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n20</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n20</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Spanish_Archer&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n21</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Footy Classified, is an Australian television program broadcast on the Nine Network which discusses pressing issues relating to AFL football. It debuted on Monday 2 April 2007. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n21</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n21</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Footy_Classified&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n22</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Violet Tendencies is a 2010 romantic comedy film directed by Casper Andreas, written by Jesse Archer, and starring Mindy Cohn and Marcus Patrick. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n22</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n22</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Violet_Tendencies&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n23</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;8.710420000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n23</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0863kh&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n23</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n24</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Meet Corliss Archer is an American sitcom that aired in syndication from April to December 1954. The series stars Ann Baker in the title role. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n24</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n24</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n25</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;The Californians is a 54-episode half-hour Western television series, set in the San Francisco gold rush of the 1850s, which aired on NBC from September 24, 1957, to May 26, 1959. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n25</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n25</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n26</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Seventh Avenue is a six-part American television miniseries broadcast in 1977. It is based on the 1967 Norman Bogner novel of the same name. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n26</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n26</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Seventh_Avenue_(miniseries)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n27</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;9.301340000000000E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n27</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/07ch475&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n27</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n28</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.1167856E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n28</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0gfds00&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n28</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n29</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Major Dad is an American sitcom created by Richard C. Okie and John G. Stephens, developed by Earl Pomerantz, that originally ran from 1989 to 1993 on CBS, starring Gerald McRaney as Major John D. MacGillis and Shanna Reed as his wife Polly. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n29</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n29</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Major_Dad&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n3</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;9.632230000000001E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n3</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0y5gfz0&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n3</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n30</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.6060818E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n30</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/02qcfrx&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n30</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n31</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n31</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n31</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n32</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.225814E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n32</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0kfwmt7&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n32</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n33</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Help! My Supply Teacher&#39;s Magic is a CBBC show which shows magicians in schools, tricking children into thinking they are supply teachers. It is presented by Iain Stirling. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n33</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n33</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Help!_My_Supply_Teacher&#39;s_Magic&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n34</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.043589E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n34</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/04q8zth&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n34</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n35</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;The Dame Edna Experience is a British television comedy talk-show hosted by Dame Edna Everage. It ran for twelve regular episodes on ITV, plus two Christmas specials.&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n35</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n35</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Dame_Edna_Experience&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n36</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;4.3221546E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n36</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/06_wvhl&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n36</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n37</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;8.711719999999999E-01&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n37</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0k2dng7&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n37</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n38</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Storefront Lawyers is an American legal drama that ran from September 1970 to April 1971 on CBS. The series stars Robert Foxworth, Sheila Larken, David Arkin, and A Martinez.&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n38</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n38</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Storefront_Lawyers&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n39</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.50758E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n39</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/0cv8fbn&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n39</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n4</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Cassius &amp;amp; Clay is an upcoming American animated television series created by Adam Reed to be aired in 2016 alongside Archer on FXX. The show follows two women, Cassius and Clay living as bandits in a futuristic, post-apocalyptic America. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n4</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n4</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Cassius_%26_Clay&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n40</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/contentUrl&gt; &quot;http://t2.gstatic.com/images?q=tbn:ANd9GcRqPkGi1_Rselb-ijqy_-5of6WsEkhDmoU036ZsvXBS83XZsWGb&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n40</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n41</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.4106644E1&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n41</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/07cggr0&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n41</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n42</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Robin Hood is a British television programme, produced by independent production company Tiger Aspect Productions for BBC One, with co-funding from the BBC America cable television channel in the United States. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n42</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n42</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Robin_Hood_(2006_TV_series)&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n5</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Animation Salvation is an Australian television Sunday night-time animation block aired on Fox8 on Sunday 7:30 pm to 10:30 pm from 7 March 2010.&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n5</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n5</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Animation_Salvation&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n6</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;Jeffrey Archer: The Truth is a 2002 BBC satirical comedy drama on the life of Jeffrey Archer, with the title role played by Damian Lewis. Its duration was 90 minutes and its premiere occurred on 1 December 2002. It was written and directed by Guy Jenkin.&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n6</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n6</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/Jeffrey_Archer:_The_Truth&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n7</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.105602E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n7</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/m/02qcyy2&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n7</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n8</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/articleBody&gt; &quot;The Big Read was a survey on books carried out by the BBC in the United Kingdom in 2003, where over three quarters of a million votes were received from the British public to find the nation&#39;s best-loved novel of all time. &quot; .</span>
+<span class="nl">_:</span><span class="n">c14n8</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/license&gt; &quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n8</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/url&gt; &quot;http://en.wikipedia.org/wiki/The_Big_Read&quot; .</span>
+<span class="nl">_:</span><span class="n">c14n9</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.googleapis.com/resultScore&gt; &quot;1.67782E0&quot;^^&lt;http://www.w3.org/2001/XMLSchema#double&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n9</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//schema.org/result&gt; &lt;http://g.co/kg/g/11cknytgw6&gt; .</span>
+<span class="nl">_:</span><span class="n">c14n9</span><span class="w"> </span><span class="o">&lt;</span><span class="nl">http:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#type&gt; &lt;http://schema.googleapis.com/EntitySearchResult&gt; .</span>
+</code></pre></div>
+
+<h2>Parse the RDF into a Queryable Graph</h2>
+<p>Next, we use the RDFLib library to parse this N3 data into a graph that we can then
+serialize into any of the RDF formats. In this case, I show an example of serializing
+into the Turtle format that is a bit easier to read. Note that RDF does not maintain any
+order of the triples that are output, so we no longer have our show listed as the first
+element. Also, you will see that the <code>@context</code> section is gone, being replaced
+with <code>@prefix</code> declarations for identifying the namespace from which terms come.</p>
+<div class="highlight"><pre><span></span><code><span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">normalized</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;n3&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;turtle&#39;</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="p">@</span><span class="n">prefix</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//schema.org/&gt; .</span>
+<span class="p">@</span><span class="n">prefix</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//schema.googleapis.com/&gt; .</span>
+<span class="p">@</span><span class="n">prefix</span><span class="w"> </span><span class="n">rdf</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .</span>
+<span class="p">@</span><span class="n">prefix</span><span class="w"> </span><span class="n">rdfs</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//www.w3.org/2000/01/rdf-schema#&gt; .</span>
+<span class="p">@</span><span class="n">prefix</span><span class="w"> </span><span class="n">xml</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//www.w3.org/XML/1998/namespace&gt; .</span>
+<span class="p">@</span><span class="n">prefix</span><span class="w"> </span><span class="n">xsd</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//www.w3.org/2001/XMLSchema#&gt; .</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/g/11cknytgw6&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Cassius &amp;amp; Clay is an upcoming American animated television series created by Adam Reed to be aired in 2016 alongside Archer on FXX. The show follows two women, Cassius and Clay living as bandits in a futuristic, post-apocalyptic America. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Cassius_%26_Clay&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Cassius &amp;amp; Clay&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0264z1w&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;The Dame Edna Experience is a British television comedy talk-show hosted by Dame Edna Everage. It ran for twelve regular episodes on ITV, plus two Christmas specials.&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/The_Dame_Edna_Experience&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;British television show&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;The Dame Edna Experience&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;&quot;&quot;Spanish Archer was a talent show hosted by Rhodri Williams and occasionally Ruth Madoc. It was produced by L!VE TV and filmed at the station&#39;s headquarters at Canary Wharf in London.</span>
+<span class="s">&quot;&quot;&quot; ;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Spanish_Archer&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;TV show&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Spanish Archer&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Footy Classified, is an Australian television program broadcast on the Nine Network which discusses pressing issues relating to AFL football. It debuted on Monday 2 April 2007. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Footy_Classified&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;Australian television program&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Footy Classified&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://wwos.ninemsn.com.au/afl/classified/&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/02rp2_&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;The Big Read was a survey on books carried out by the BBC in the United Kingdom in 2003, where over three quarters of a million votes were received from the British public to find the nation&#39;s best-loved novel of all time. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/The_Big_Read&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;Television Programme&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;The Big Read&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/04q8zth&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;The Californians is a 54-episode half-hour Western television series, set in the San Francisco gold rush of the 1850s, which aired on NBC from September 24, 1957, to May 26, 1959. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;Television Series&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">image</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">contentUrl</span><span class="w"> </span><span class="s">&quot;http://t3.gstatic.com/images?q=tbn:ANd9GcSQ0FvOFyPFq3qLlZsbr4UTcIef_WZFGTqQfVum3VzCxpykLMhK&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/The_Californians_(TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;The Californians&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0522jn&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Major Dad is an American sitcom created by Richard C. Okie and John G. Stephens, developed by Earl Pomerantz, that originally ran from 1989 to 1993 on CBS, starring Gerald McRaney as Major John D. MacGillis and Shanna Reed as his wife Polly. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Major_Dad&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;American sitcom&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Major Dad&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Archer is an American adult animated television series created by Adam Reed for the FX network. A preview of the series aired on September 17, 2009. The first season premiered on January 14, 2010. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Archer_(TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;American animated series&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">image</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">contentUrl</span><span class="w"> </span><span class="s">&quot;http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;http://creativecommons.org/licenses/by/2.0&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Archer_(TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Archer&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://www.fxnetworks.com/archer&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/06w21l8&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Meet Corliss Archer is an American sitcom that aired in syndication from April to December 1954. The series stars Ann Baker in the title role. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;American sitcom&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">image</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">contentUrl</span><span class="w"> </span><span class="s">&quot;http://t2.gstatic.com/images?q=tbn:ANd9GcRqPkGi1_Rselb-ijqy_-5of6WsEkhDmoU036ZsvXBS83XZsWGb&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Meet_Corliss_Archer_(TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Meet Corliss Archer&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/076vrw4&gt; a ns1:Movie,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">TVSeries</span><span class="p">,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Standing on the Edge of the Noise is a unique, intimate look at Oasis performing in their own space, instead of the huge stadium stages on which they are more often seen. The programme includes a mix of classics and new tracks from Dig Out Your Soul. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Standing_on_the_Edge_of_the_Noise&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;TV programme&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Standing on the Edge of the Noise&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/07cggr0&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;TV series&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Archer (1975)&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/07ch475&gt; a ns1:Movie,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">TVSeries</span><span class="p">,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Seventh Avenue is a six-part American television miniseries broadcast in 1977. It is based on the 1967 Norman Bogner novel of the same name. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Seventh_Avenue_(miniseries)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;American television miniseries&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Seventh Avenue&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0863kh&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Storefront Lawyers is an American legal drama that ran from September 1970 to April 1971 on CBS. The series stars Robert Foxworth, Sheila Larken, David Arkin, and A Martinez.&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Storefront_Lawyers&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;American drama series&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Storefront Lawyers&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Robin Hood is a British television programme, produced by independent production company Tiger Aspect Productions for BBC One, with co-funding from the BBC America cable television channel in the United States. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Robin_Hood_(2006_TV_series)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;British television programme&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Robin Hood&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://www.robin-hood.tv/&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; a ns1:Movie,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">TVSeries</span><span class="p">,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Violet Tendencies is a 2010 romantic comedy film directed by Casper Andreas, written by Jesse Archer, and starring Mindy Cohn and Marcus Patrick. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Violet_Tendencies&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;2010 film&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Violet Tendencies&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0gfds00&gt; a ns1:Movie,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">TVSeries</span><span class="p">,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Jeffrey Archer: The Truth is a 2002 BBC satirical comedy drama on the life of Jeffrey Archer, with the title role played by Damian Lewis. Its duration was 90 minutes and its premiere occurred on 1 December 2002. It was written and directed by Guy Jenkin.&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Jeffrey_Archer:_The_Truth&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;2002 film&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Jeffrey Archer: The Truth&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Animation Salvation is an Australian television Sunday night-time animation block aired on Fox8 on Sunday 7:30 pm to 10:30 pm from 7 March 2010.&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Animation_Salvation&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;Television Program&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Animation Salvation&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; a ns1:TVSeries,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Help! My Supply Teacher&#39;s Magic is a CBBC show which shows magicians in schools, tricking children into thinking they are supply teachers. It is presented by Iain Stirling. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Help!_My_Supply_Teacher&#39;s_Magic&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;TV Show&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Help! My Supply Teacher&#39;s Magic&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; a ns1:Movie,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">TVSeries</span><span class="p">,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;&quot;&quot;The Pirate is a 1978 American TV movie directed by Ken Annakin. It is based on the novel with the same title written by Harold Robbins.</span>
+<span class="n">It</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="n">broadcast</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">ABC</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="n">parts</span><span class="w"> </span><span class="n">November</span><span class="w"> </span><span class="mi">21</span><span class="err">–</span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="mf">1978.</span><span class="s">&quot;&quot;&quot; ;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/The_Pirate_(1978_film)&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;1978 film&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;The Pirate&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; a ns1:Movie,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">TVSeries</span><span class="p">,</span>
+<span class="w">        </span><span class="nl">ns1</span><span class="p">:</span><span class="n">Thing</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns2</span><span class="p">:</span><span class="n">detailedDescription</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">articleBody</span><span class="w"> </span><span class="s">&quot;Roald Dahl&#39;s Esio Trot is a British comedy television film that was first broadcast as part of BBC One&#39;s 2014 Christmas programming. &quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">license</span><span class="w"> </span><span class="s">&quot;https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">url</span><span class="w"> </span><span class="s">&quot;http://en.wikipedia.org/wiki/Roald_Dahl&#39;s_Esio_Trot&quot;</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">description</span><span class="w"> </span><span class="s">&quot;Television film&quot;</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">name</span><span class="w"> </span><span class="s">&quot;Roald Dahl&#39;s Esio Trot&quot;</span><span class="w"> </span><span class="p">.</span>
+
+<span class="p">[]</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns1</span><span class="o">:</span><span class="n">ItemList</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="nl">ns1</span><span class="p">:</span><span class="n">itemListElement</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.214568e+01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/06w21l8&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.142771e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0522jn&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">8.06576e-01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/076vrw4&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">8.17672e-01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/02rp2_&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.123545e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0264z1w&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.573618e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0bcr8s&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.371247e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0hzp2zq&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">8.71042e-01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0863kh&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">9.30134e-01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/07ch475&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.116786e+01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0gfds00&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">9.63223e-01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0y5gfz0&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.606082e+01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/02qcfrx&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.225814e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0kfwmt7&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.043589e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/04q8zth&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">4.322155e+01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/06_wvhl&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">8.71172e-01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0k2dng7&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.50758e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/0cv8fbn&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.410664e+01</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/07cggr0&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.105602e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/m/02qcyy2&gt; ],</span>
+<span class="w">        </span><span class="p">[</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="n">ns2</span><span class="o">:</span><span class="n">EntitySearchResult</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns2</span><span class="p">:</span><span class="n">resultScore</span><span class="w"> </span><span class="mf">1.67782e+00</span><span class="w"> </span><span class="p">;</span>
+<span class="w">            </span><span class="nl">ns1</span><span class="p">:</span><span class="n">result</span><span class="w"> </span><span class="o">&lt;</span><span class="n">http</span><span class="o">:</span><span class="c1">//g.co/kg/g/11cknytgw6&gt; ] .</span>
+</code></pre></div>
+
+<h2>Querying the Knowlege Graph with SPARQL</h2>
+<p>Now that we have our graph loaded into RDFLib, we can issue a SPARQL query against it.
+Now this query is only being issued againts the results we returned from the API and not
+the entire Knowledge Graph, but it will give you a flavor for the query syntax.</p>
+<p>To break this down a little, We have four keywords to parse: SELECT, WHERE, ORDER BY
+DESC, and LIMIT. SELECT is simuilar to SQL and contains our, unituitively named, '
+Projection' criteria or what we want returned to us as a table. The real meat is in the
+WHERE clause that provides our 'Selection' criteria using graph pattern matching on the
+triples in the graph. Here I am first looking up the the score of all the search
+results, then gathering the name, url, and an associated image. ORDER BY DESC allows us
+to sort our results with the highest score at the top and LIMIT just grabs the top
+results.</p>
+<div class="highlight"><pre><span></span><code><span class="n">q</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;SELECT ?name ?description ?url ?score ?image</span>
+<span class="s2">       WHERE {?b a ns2:EntitySearchResult ;</span>
+<span class="s2">                 ns2:resultScore ?score ;</span>
+<span class="s2">                 ns1:result ?result .</span>
+<span class="s2">              ?result ns1:description ?description ;</span>
+<span class="s2">                      ns1:name ?name ;</span>
+<span class="s2">                      ns1:url  ?url ;</span>
+<span class="s2">                      ns1:image ?b_image .</span>
+<span class="s2">              ?b_image ns1:contentUrl ?image .}</span>
+<span class="s2">       ORDER BY DESC(?score)</span>
+<span class="s2">       LIMIT 1</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">))</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>name,description,url,score,image
+Archer,American animated series,http://www.fxnetworks.com/archer,43.221546,http://t3.gstatic.com/images?q=tbn:ANd9GcQwUXmJt_InhAr39HEyyv8l4CIiom0RvTvNYcf-JoCN8cpXOyon
+</code></pre></div>
+
+<h2>Summary</h2>
+<p>So here I've shown how you can get started with converting data from the knowledge graph
+into RDF and query it using the SPARQL query language. This is only scratching the
+surface, as the real power of these technologies are to integrate data from external
+sources. For example, as a next step we may want to query dbpedia using the URL we
+acquired here to gain additional information about actors or episodes and further
+explore the information retrieved as linked data. Of course here we are only looking at
+a TV Show, but as additional schema.org types are supported by the Knowledge Grpah API,
+I imagine that there will be links and hooks that enable searching across Drug databases
+and interoperating the data retrieved from Google, with more traditional sources of
+Linked Data from bioinformatics databases and forming a Giant Global Graph of linked
+data.</p>
+<p><img src="http://lod-cloud.net/versions/2014-08-30/lod-cloud.svg"></p>
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
 
 
              
