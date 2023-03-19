@@ -53,6 +53,5 @@ DEFAULT_PAGINATION = 10
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
 
-PLUGINS = ['webassets', 'tipue_search', 'liquid_tags']
+PLUGINS = ['webassets', 'liquid_tags']
 LIQUID_TAGS = ["img", "literal", "video", "youtube", "vimeo", "include_code"]
-DIRECT_TEMPLATES = ['search']
