@@ -5,11 +5,11 @@ Save_as: index.html
 Status: hidden
 Author: Nolan Nichols <http://orcid.org/0000-0003-1099-3328>
 
-### Diving into Biotech Data Architecture and Intelligent Systems
+### Thoughts on Data Architecture for Biotech R&D
 
 Are you interested in creating more trustworthy and reproducible results in the biotech
-industry? Look no further! My website focuses on the power of knowledge graphs and large
-language models working in concert for authoring, processing, and managing 
+industry? Look no further! This website focuses on the power of knowledge graphs and 
+large language models working in concert for authoring, processing, and managing 
 biomedical knowledge, information, and data.
 
 By combining these tools, we can create a data-centric architecture that supports the
