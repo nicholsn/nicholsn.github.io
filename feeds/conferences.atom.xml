@@ -39,4 +39,10 @@ Additionally, the system automates image processing and scoring of
 clinical/neuropsychological measures. Currently, I'm working to now incorporate NIDM and
 BIDS into the NCANDA framework to demonstrate how these standards can be used in the
 wild. You can check out my presentation below and let me know what you think!&lt;/p&gt;
-&lt;p&gt;{% youtube RduYPL82K64 %}&lt;/p&gt;</content><category term="Conferences"></category><category term="neuroinformatics"></category><category term="nidm"></category><category term="data sharing"></category><category term="ncanda"></category></entry></feed>
+&lt;p&gt;&lt;span class="videobox"&gt;
+                    &lt;iframe width="640" height="390"
+                        src='https://www.youtube.com/embed/RduYPL82K64'
+                        frameborder='0' webkitAllowFullScreen
+                        mozallowfullscreen allowFullScreen&gt;
+                    &lt;/iframe&gt;
+                &lt;/span&gt;&lt;/p&gt;</content><category term="Conferences"></category><category term="neuroinformatics"></category><category term="nidm"></category><category term="data sharing"></category><category term="ncanda"></category></entry></feed>
