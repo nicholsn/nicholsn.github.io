@@ -23,4 +23,4 @@ Past Projects
 - Scaleable Neuroimaging Initiative
 - Distributed Query-based Data Integration
 
-[grex]: (https://www.slideshare.net/nicholsn/meaningful-metadata-at-scale-removing-barriers-to-precision-medicine-research
+[grex]: https://www.slideshare.net/nicholsn/meaningful-metadata-at-scale-removing-barriers-to-precision-medicine-research
