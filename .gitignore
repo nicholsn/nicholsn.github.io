@@ -41,3 +41,10 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Node / Astro
+node_modules/
+dist/
+.astro/
+.DS_Store
+npm-debug.log*

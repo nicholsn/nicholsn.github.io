@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: d.title,
+  datePublished: d.date.toISOString(),
+  ...(d.updated ? { dateModified: d.updated.toISOString() } : {}),
+  ...(d.description ? { description: d.description } : {}),
+  author: { '@type': 'Person', '@id': 'https://orcid.org/0000-0003-1099-3328', name: 'Nolan Nichols' },
+  url: new URL(`/blog/${entry.id}`, Astro.site).href,
+  ...(d.tags ? { keywords: d.tags.join(', ') } : {}),
+};
+---
+
+<Base title={`${d.title} — Nolan Nichols`} description={d.description} jsonld={jsonld}>
+  <article>
+    <h1>{d.title}</h1>
+    <p class="meta">
+      {d.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      {d.category ? ` · ${d.category}` : ''}
+    </p>
+    <Content />
+  </article>
+  <p style="margin-top:2rem"><a href="/blog">← All writing</a></p>
+</Base>

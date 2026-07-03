@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { loadBundle, personJsonLd, byStartDesc, hrefOf } from '../lib/lokf';
+
+const { concepts, byIri } = await loadBundle();
+const person = concepts.find((e) => e.data.type === 'Person')!;
+const roles = concepts.filter((e) => e.data.type === 'Role').sort(byStartDesc);
+const featured = concepts.filter((e) => e.data.type === 'Document' && (e.data as any).featured);
+const posts = (await getCollection('blog'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+
+const d = person.data as any;
+const jsonld = personJsonLd(person, roles, byIri);
+---
+
+<Base title={`${d.name} — ${d.headline}`} description={d.description} jsonld={jsonld}>
+  <section class="hero">
+    {d.image && <img src={d.image} alt={d.name} />}
+    <div class="lede">
+      <h1>{d.name}</h1>
+      <p class="tagline">{d.headline}</p>
+      <div class="lede-links">
+        <a href="/about">About &amp; CV →</a>
+        <a href={d.github}>GitHub</a>
+        <a href={d.orcid}>ORCID</a>
+        <a href={d.linkedin}>LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <p>{d.description}</p>
+
+  <h2>Featured work</h2>
+  <div class="grid">
+    {featured.map((p) => (
+      <a class="card" href={hrefOf(p)}>
+        <h3>{p.data.title}</h3>
+        <p>{p.data.description}</p>
+      </a>
+    ))}
+  </div>
+
+  <h2>Recent writing</h2>
+  <ul class="post-list">
+    {posts.map((p) => (
+      <li>
+        <a href={`/blog/${p.id}`}>{p.data.title}</a>
+        <div class="when">
+          {p.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  <p style="margin-top:2rem"><a href="/projects/lokf">This site is a live LOKF knowledge graph →</a></p>
+</Base>
