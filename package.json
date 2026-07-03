@@ -10,6 +10,8 @@
     "check": "astro check"
   },
   "dependencies": {
-    "astro": "^5.0.0"
+    "astro": "^5.0.0",
+    "cytoscape": "^3.34.0",
+    "cytoscape-fcose": "^2.2.0"
   }
 }

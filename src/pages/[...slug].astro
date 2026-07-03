@@ -58,7 +58,7 @@ const isRole = d.type === 'Role';
 
   {(forward.length > 0 || back.length > 0) && (
     <div class="relations">
-      <h3>Knowledge graph</h3>
+      <h3>Knowledge graph <a class="rel-open" href={`/graph?focus=${entry.id}`}>open in browser →</a></h3>
       {forward.map((f) => (
         <div>
           <span class="rel-kind">{REL_LABEL[f.slot] ?? f.slot}</span>

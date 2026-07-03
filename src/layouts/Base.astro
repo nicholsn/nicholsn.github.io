@@ -9,13 +9,15 @@ interface Props {
 }
 const { title, description, jsonld, wide } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav = [
-  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/publications', label: 'Publications' },
   { href: '/blog', label: 'Writing' },
+  { href: '/graph', label: 'Graph' },
 ];
+const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 const graphs = jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [];
 const year = new Date().getFullYear();
 ---
@@ -32,14 +34,27 @@ const year = new Date().getFullYear();
     {description && <meta property="og:description" content={description} />}
     <meta property="og:type" content="website" />
     <meta name="generator" content="Astro + LOKF" />
+    <meta name="theme-color" content="#fbf9f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14120d" media="(prefers-color-scheme: dark)" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
     {graphs.map((g) => (
       <script type="application/ld+json" set:html={JSON.stringify(g)} />
     ))}
   </head>
   <body>
+    <div class="topbar" aria-hidden="true"></div>
     <header class="site-header">
-      <a href="/" class="brand">Nolan Nichols</a>
-      <nav>{nav.map((n) => <a href={n.href}>{n.label}</a>)}</nav>
+      <a href="/" class="brand">Nolan&nbsp;Nichols</a>
+      <nav>
+        {nav.map((n) => (
+          <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>{n.label}</a>
+        ))}
+      </nav>
     </header>
     <main class={wide ? 'container wide' : 'container'}>
       <slot />
@@ -47,10 +62,14 @@ const year = new Date().getFullYear();
     <footer class="site-footer">
       <p>
         © {year} Nolan Nichols · this site is a
-        <a href="/projects/lokf">LOKF</a> bundle
-        (<a href="/graph.jsonld">JSON-LD</a>) ·
-        <a href="https://github.com/nicholsn">GitHub</a> ·
+        <a href="/projects/lokf">LOKF</a> knowledge graph —
+        explore the <a href="/graph">browser</a> or the raw
+        <a href="/graph.jsonld">JSON-LD</a>.
+      </p>
+      <p class="social">
+        <a href="https://github.com/nicholsn">GitHub</a>
         <a href="https://orcid.org/0000-0003-1099-3328">ORCID</a>
+        <a href="https://www.linkedin.com/in/nolannichols">LinkedIn</a>
       </p>
     </footer>
   </body>
