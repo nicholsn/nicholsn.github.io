@@ -4,6 +4,7 @@ date: 2016-01-12
 category: "Semantic Web"
 tags: ["semantic web", "owl", "rdf"]
 description: "How to access the Google Knowledge Graph API as RDF using SPARQL"
+about: [https://www.nolan-nichols.com/projects/lokf, https://www.nolan-nichols.com/projects/nidm]
 ---
 
 ## Introduction

@@ -4,6 +4,7 @@ date: 2015-09-28
 category: "Semantic Web"
 tags: ["semantic web", "nidm", "owl", "rdf"]
 description: "A quick overview of RDFS reasoning when specifying the domain for a given property."
+about: [https://www.nolan-nichols.com/projects/nidm]
 ---
 
 ## Overview

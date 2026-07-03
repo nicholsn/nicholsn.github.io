@@ -9,6 +9,7 @@ resource: https://doi.org/10.1111/j.1530-0277.2009.01020.x
 venue: "Alcoholism: Clinical and Experimental Research"
 year: 2009
 sameAs: [https://doi.org/10.1111/j.1530-0277.2009.01020.x]
+relatedTo: [https://www.nolan-nichols.com/projects/ncanda]
 tags: [neuropsychology, memory, hiv, alcoholism]
 timestamp: 2009-01-01
 ---

@@ -8,6 +8,7 @@ description: >-
 resource: https://lokf.nolan-nichols.com/
 definedBy: [https://lokf.nolan-nichols.com/]
 sameAs: [https://github.com/nicholsn/lokf]
+relatedTo: [https://www.nolan-nichols.com/projects/nidm]
 tags: [knowledge graph, json-ld, rdf, linkml, semantic web, schema.org]
 timestamp: 2026-07-03
 featured: true

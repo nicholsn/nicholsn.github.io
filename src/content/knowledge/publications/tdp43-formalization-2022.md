@@ -8,6 +8,7 @@ resource: https://doi.org/10.3233/DS-210039
 venue: Data Science
 year: 2022
 sameAs: [https://doi.org/10.3233/DS-210039]
+relatedTo: [https://www.nolan-nichols.com/projects/lokf]
 tags: [knowledge representation, als, tdp-43, semantics]
 timestamp: 2022-01-01
 ---
