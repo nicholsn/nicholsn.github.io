@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+import { render } from 'astro:content';
+import { loadBundle, personJsonLd, byStartDesc, fmtRange } from '../lib/lokf';
+
+const { concepts, byIri } = await loadBundle();
+const person = concepts.find((e) => e.data.type === 'Person')!;
+const { Content } = await render(person);
+const roles = concepts.filter((e) => e.data.type === 'Role');
+const employment = roles.filter((r) => (r.data as any).roleType !== 'education').sort(byStartDesc);
+const education = roles.filter((r) => (r.data as any).roleType === 'education').sort(byStartDesc);
+
+const d = person.data as any;
+const jsonld = personJsonLd(person, roles.slice().sort(byStartDesc), byIri);
+const orgName = (iri?: string) => {
+  const o = iri ? byIri.get(iri) : undefined;
+  return o ? ((o.data as any).name ?? o.data.title) : '';
+};
+---
+
+<Base title={`About — ${d.name}`} description={d.description} jsonld={jsonld}>
+  <h1>About</h1>
+  <article><Content /></article>
+
+  <h2>Experience</h2>
+  <div class="timeline">
+    {employment.map((r) => {
+      const rd = r.data as any;
+      return (
+        <div class="tl-item">
+          <div class="role">
+            {rd.roleName} <span class="org">· {orgName((rd.memberOf ?? [])[0])}</span>
+          </div>
+          <div class="when">{fmtRange(rd.startDate, rd.endDate)}{rd.location ? ` · ${rd.location}` : ''}</div>
+        </div>
+      );
+    })}
+  </div>
+
+  <h2>Education</h2>
+  <div class="timeline">
+    {education.map((r) => {
+      const rd = r.data as any;
+      return (
+        <div class="tl-item">
+          <div class="role">{rd.roleName}</div>
+          <div class="when">{orgName((rd.memberOf ?? [])[0])} · {fmtRange(rd.startDate, rd.endDate)}</div>
+        </div>
+      );
+    })}
+  </div>
+
+  <p class="meta" style="margin-top:2rem">
+    Full publication list on the <a href="/publications">publications page</a>.
+    Every role and organization above is a resolvable concept in this site's
+    <a href="/projects/lokf">LOKF knowledge graph</a>.
+  </p>
+</Base>

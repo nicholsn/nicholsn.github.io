@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import { loadBundle, hrefOf } from '../../lib/lokf';
+
+const { concepts } = await loadBundle();
+const projects = concepts
+  .filter((e) => e.data.type === 'Document')
+  .sort((a, b) => Number(!!(b.data as any).featured) - Number(!!(a.data as any).featured));
+---
+
+<Base title="Projects — Nolan Nichols" description="Platforms, standards, and open-source work in biomedical data." wide>
+  <h1>Projects</h1>
+  <p>Platforms, data standards, and open-source work spanning biomedical data, neuroscience, and knowledge representation.</p>
+  <div class="grid">
+    {projects.map((p) => (
+      <a class="card" href={hrefOf(p)}>
+        <h3>{p.data.title}</h3>
+        <p>{p.data.description}</p>
+      </a>
+    ))}
+  </div>
+</Base>

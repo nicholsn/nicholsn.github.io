@@ -1,0 +1,57 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  jsonld?: unknown;
+  wide?: boolean;
+}
+const { title, description, jsonld, wide } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/publications', label: 'Publications' },
+  { href: '/blog', label: 'Writing' },
+];
+const graphs = jsonld ? (Array.isArray(jsonld) ? jsonld : [jsonld]) : [];
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content="website" />
+    <meta name="generator" content="Astro + LOKF" />
+    {graphs.map((g) => (
+      <script type="application/ld+json" set:html={JSON.stringify(g)} />
+    ))}
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/" class="brand">Nolan Nichols</a>
+      <nav>{nav.map((n) => <a href={n.href}>{n.label}</a>)}</nav>
+    </header>
+    <main class={wide ? 'container wide' : 'container'}>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>
+        © {year} Nolan Nichols · this site is a
+        <a href="/projects/lokf">LOKF</a> bundle
+        (<a href="/graph.jsonld">JSON-LD</a>) ·
+        <a href="https://github.com/nicholsn">GitHub</a> ·
+        <a href="https://orcid.org/0000-0003-1099-3328">ORCID</a>
+      </p>
+    </footer>
+  </body>
+</html>

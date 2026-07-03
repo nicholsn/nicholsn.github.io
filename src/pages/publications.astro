@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { loadBundle, hrefOf } from '../lib/lokf';
+
+const { concepts } = await loadBundle();
+const pubs = concepts
+  .filter((e) => e.data.type === 'Reference')
+  .sort((a, b) => ((b.data as any).year ?? 0) - ((a.data as any).year ?? 0));
+const years = [...new Set(pubs.map((p) => (p.data as any).year))];
+---
+
+<Base title="Publications — Nolan Nichols" description="Peer-reviewed publications, preprints, and proceedings.">
+  <h1>Publications</h1>
+  <p class="meta">
+    {pubs.length} works · complete record on
+    <a href="https://orcid.org/0000-0003-1099-3328">ORCID</a>.
+  </p>
+
+  {years.map((y) => (
+    <>
+      <div class="pub-year">{y}</div>
+      {pubs
+        .filter((p) => (p.data as any).year === y)
+        .map((p) => {
+          const pd = p.data as any;
+          return (
+            <div class="pub">
+              <a href={pd.resource ?? hrefOf(p)}>{p.data.title}</a>
+              {pd.venue && <span class="venue"> — {pd.venue}</span>}
+              {' '}
+              <a class="meta" href={hrefOf(p)}>· details</a>
+            </div>
+          );
+        })}
+    </>
+  ))}
+</Base>

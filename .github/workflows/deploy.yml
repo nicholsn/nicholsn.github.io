@@ -1,0 +1,37 @@
+name: deploy
+
+# Builds the Astro site and publishes it to GitHub Pages. Replaces the old
+# Pelican `gh-pages` branch deploy. After merging to main, switch the repo's
+# Pages "Source" (Settings → Pages) from "Deploy from a branch" to
+# "GitHub Actions" for this workflow to take over serving www.nolan-nichols.com.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; don't cancel an in-flight production deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: withastro/action@v3 # installs deps, runs `astro build`, uploads the Pages artifact
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

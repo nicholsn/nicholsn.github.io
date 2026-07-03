@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import {
+  loadBundle, iriOf, hrefOf, RELATION_SLOTS, REL_LABEL, conceptJsonLd, fmtRange,
+} from '../lib/lokf';
+
+export async function getStaticPaths() {
+  const all = await getCollection('knowledge');
+  return all
+    .filter((e) => e.data.type !== 'KnowledgeBundle')
+    .map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { concepts, byIri } = await loadBundle();
+const { Content } = await render(entry);
+const d = entry.data as any;
+const myIri = iriOf(entry);
+const slots = [...RELATION_SLOTS, 'memberOf', 'holder'];
+
+const forward = slots
+  .map((slot) => ({ slot, vals: (d[slot] ?? []) as string[] }))
+  .filter((f) => f.vals.length)
+  .map((f) => ({
+    slot: f.slot,
+    items: f.vals.map((iri) => ({ iri, target: byIri.get(iri) })),
+  }));
+
+const back = concepts.filter((c) => {
+  if (c.id === entry.id) return false;
+  const cd = c.data as any;
+  return slots.some((s) => (cd[s] ?? []).includes(myIri));
+});
+
+const jsonld = conceptJsonLd(entry, byIri);
+const isRole = d.type === 'Role';
+---
+
+<Base title={`${entry.data.title} — Nolan Nichols`} description={d.description} jsonld={jsonld}>
+  <p><span class="badge">{d.type}</span></p>
+  <h1>{entry.data.title}</h1>
+  {isRole && (
+    <p class="meta">{fmtRange(d.startDate, d.endDate)}{d.location ? ` · ${d.location}` : ''}</p>
+  )}
+  {d.description && <p class="tagline">{d.description}</p>}
+
+  <article><Content /></article>
+
+  {(d.resource || (d.sameAs && d.sameAs.length)) && (
+    <p class="lede-links">
+      {d.resource && <a href={d.resource}>Visit resource ↗</a>}
+      {(d.sameAs ?? []).map((s: string) => (
+        <a href={s}>{new URL(s).hostname.replace('www.', '')} ↗</a>
+      ))}
+    </p>
+  )}
+
+  {(forward.length > 0 || back.length > 0) && (
+    <div class="relations">
+      <h3>Knowledge graph</h3>
+      {forward.map((f) => (
+        <div>
+          <span class="rel-kind">{REL_LABEL[f.slot] ?? f.slot}</span>
+          <ul>
+            {f.items.map((it) => (
+              <li>
+                {it.target
+                  ? <a href={hrefOf(it.target)}>{it.target.data.title}</a>
+                  : <a href={it.iri}>{it.iri}</a>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      {back.length > 0 && (
+        <div>
+          <span class="rel-kind">Referenced by</span>
+          <ul>
+            {back.map((c) => <li><a href={hrefOf(c)}>{c.data.title}</a></li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  )}
+</Base>
